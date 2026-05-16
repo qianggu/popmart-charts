@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#c8332e">
+<title>泡泡玛特投资评估报告（格雷厄姆三支柱框架）</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+  :root {
+    --bg: #fafaf7;
+    --ink: #1a1a1a;
+    --muted: #6b6b6b;
+    --line: #e0ddd5;
+    --accent: #c8332e;
+    --accent-soft: #fdf8f6;
+    --bull: #2d6a4f;
+    --bear: #b8860b;
+    --safe: #1d4e89;
+    --paper: #ffffff;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+                 "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.75;
+    font-size: 15px;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 44px 28px 80px; }
+
+  header {
+    border-bottom: 3px solid var(--accent);
+    padding-bottom: 26px;
+    margin-bottom: 36px;
+  }
+  header .eyebrow {
+    color: var(--accent);
+    font-size: 12px;
+    letter-spacing: 2px;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  header h1 {
+    font-size: 30px;
+    margin: 0 0 10px;
+    letter-spacing: -0.5px;
+    line-height: 1.3;
+  }
+  header .sub { color: var(--muted); font-size: 13px; line-height: 1.65; }
+  header .nav { margin-top: 16px; font-size: 13px; }
+  header .nav a { color: var(--accent); text-decoration: none; margin-right: 14px; }
+
+  .graham-quote {
+    background: linear-gradient(135deg, #fdf8f6 0%, #faf3ed 100%);
+    border-left: 5px solid var(--accent);
+    padding: 22px 26px 18px;
+    margin: 0 0 36px;
+    border-radius: 0 8px 8px 0;
+  }
+  .graham-quote h3 {
+    margin: 0 0 10px;
+    color: var(--accent);
+    font-size: 13px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+  .graham-quote blockquote {
+    margin: 0 0 8px;
+    font-size: 17px;
+    line-height: 1.7;
+    color: var(--ink);
+    font-style: italic;
+    border: none;
+    padding: 0;
+  }
+  .graham-quote cite {
+    display: block;
+    color: var(--muted);
+    font-size: 12px;
+    text-align: right;
+    font-style: normal;
+  }
+  .graham-quote .pillars {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed var(--line);
+  }
+  .graham-quote .pillar-mini {
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .graham-quote .pillar-mini strong {
+    display: block;
+    color: var(--accent);
+    font-size: 15px;
+    margin-bottom: 2px;
+  }
+
+  section { margin-bottom: 50px; }
+  section h2 {
+    font-size: 22px;
+    margin: 0 0 14px;
+    padding: 6px 0 8px;
+    border-bottom: 2px solid var(--accent);
+    letter-spacing: -0.3px;
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+  section h2 .pillar-tag {
+    display: inline-block;
+    font-size: 11px;
+    padding: 2px 10px;
+    border-radius: 3px;
+    background: var(--accent);
+    color: #fff;
+    letter-spacing: 1.5px;
+    font-weight: 600;
+  }
+  section h3 { font-size: 17px; margin: 24px 0 8px; color: var(--ink); }
+  section h4 { font-size: 14px; margin: 16px 0 6px; color: var(--accent); letter-spacing: 0.5px; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 13.5px;
+  }
+  th, td {
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+  th { background: #f4f0e8; font-weight: 600; font-size: 13px; }
+  td strong { color: var(--accent); }
+
+  .chart { width: 100%; height: 380px; margin: 14px 0; }
+  .chart-tall { width: 100%; height: 440px; margin: 14px 0; }
+
+  .verdict {
+    padding: 14px 18px 12px;
+    border-radius: 6px;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+  .verdict-safe { background: #f0f8f3; border-left: 4px solid var(--bull); }
+  .verdict-warn { background: #fdf6e9; border-left: 4px solid var(--bear); }
+  .verdict-risk { background: var(--accent-soft); border-left: 4px solid var(--accent); }
+  .verdict h4 { margin: 0 0 6px; font-size: 14px; }
+  .verdict-safe h4 { color: var(--bull); }
+  .verdict-warn h4 { color: var(--bear); }
+  .verdict-risk h4 { color: var(--accent); }
+
+  .key-numbers {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin: 18px 0;
+  }
+  .kn-card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 14px 12px;
+    text-align: center;
+  }
+  .kn-card .label { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .kn-card .value { font-size: 20px; font-weight: 600; color: var(--accent); }
+  .kn-card .sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .twocol {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 14px 0;
+  }
+  .twocol > div {
+    padding: 14px 16px;
+    border-radius: 6px;
+  }
+  .col-pro { background: #f0f8f3; border-left: 4px solid var(--bull); }
+  .col-con { background: var(--accent-soft); border-left: 4px solid var(--accent); }
+  .col-pro h4 { color: var(--bull); margin: 0 0 6px; }
+  .col-con h4 { color: var(--accent); margin: 0 0 6px; }
+  .twocol ul { margin: 4px 0; padding-left: 18px; font-size: 13.5px; }
+
+  .checklist {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 16px 20px;
+    margin: 12px 0;
+  }
+  .checklist h4 { margin: 0 0 8px; font-size: 14px; }
+  .checklist ul { margin: 0; padding-left: 22px; font-size: 13.5px; }
+  .checklist li { margin-bottom: 5px; }
+  .checklist .freq { color: var(--muted); font-size: 11px; }
+
+  .disclaimer {
+    background: #f8f6f0;
+    border: 1px dashed var(--line);
+    border-radius: 6px;
+    padding: 16px 20px;
+    margin: 28px 0 20px;
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+  .disclaimer strong { color: var(--accent); }
+
+  footer {
+    margin-top: 36px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 12px;
+    word-break: break-all;
+  }
+  footer code { background: #f0ece4; padding: 1px 6px; border-radius: 3px; font-size: 11px; }
+  footer a { color: var(--accent); text-decoration: none; }
+
+  strong.hi { color: var(--accent); }
+  strong.bull { color: var(--bull); }
+  strong.bear { color: var(--bear); }
+  strong.safe { color: var(--safe); }
+  em.caveat { color: var(--bear); font-style: normal; font-size: 13px; }
+
+  @media (max-width: 700px) {
+    body { font-size: 14px; line-height: 1.7; }
+    .wrap { padding: 26px 14px 60px; }
+    header h1 { font-size: 22px; line-height: 1.35; }
+    header .sub { font-size: 12px; }
+    section h2 { font-size: 18px; flex-wrap: wrap; }
+    section h2 .pillar-tag { font-size: 10px; padding: 1px 8px; }
+    section h3 { font-size: 15px; }
+    .graham-quote { padding: 16px 18px 14px; }
+    .graham-quote blockquote { font-size: 15px; }
+    .graham-quote .pillars { grid-template-columns: 1fr; gap: 6px; }
+    .key-numbers { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .kn-card { padding: 10px 8px; }
+    .kn-card .value { font-size: 17px; }
+    .twocol { grid-template-columns: 1fr; gap: 12px; }
+    table { font-size: 12.5px; }
+    th, td { padding: 8px 8px; }
+    .chart { height: 320px; }
+    .chart-tall { height: 380px; }
+    .verdict { padding: 12px 14px 10px; font-size: 13.5px; }
+    .disclaimer { font-size: 11.5px; padding: 12px 14px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">POP MART · 9992.HK · 投资评估报告</div>
+  <h1>泡泡玛特股票投资评估报告</h1>
+  <div class="sub">
+    以本杰明·格雷厄姆"投资 vs 投机"定义为框架的全面分析报告。
+    数据截止 2026-05-16；基于 22 份一手 wiki 来源（4 份年报序列 + 招股书 + 2 次创始人访谈 + 卖方覆盖 + 同业对照）。
+  </div>
+  <div class="nav">
+    <a href="./">← 历史趋势图表</a>
+    <a href="popmart-brand-valuation-framework.html">品牌价值评估框架</a>
+  </div>
+</header>
+
+<div class="graham-quote">
+  <h3>格雷厄姆的投资定义</h3>
+  <blockquote>
+    "投资运作是根据深入的分析（thorough analysis），承诺本金安全（safety of principal）以及回报率令人满意（satisfactory return）的操作。
+    不能满足这三个要求的，就是投机。"
+  </blockquote>
+  <cite>— Benjamin Graham, 《Security Analysis》 (1934)</cite>
+  <div class="pillars">
+    <div class="pillar-mini"><strong>支柱一</strong>深入的分析</div>
+    <div class="pillar-mini"><strong>支柱二</strong>本金安全</div>
+    <div class="pillar-mini"><strong>支柱三</strong>满意回报</div>
+  </div>
+</div>
+
+<div class="verdict verdict-warn">
+  <h4>⚠ 报告核心结论（先说在前）</h4>
+  泡泡玛特<strong>在 HK$152.40 / PE ~15x 当前价位</strong>满足格雷厄姆三支柱中的<strong>2 项</strong>（深入分析可行 + 满意回报可期），<strong>本金安全</strong>支柱<strong>是有条件成立</strong>——条件是 2026 H1 中报后三项核心 KPI 不全部恶化。
+  按格雷厄姆严格标准（要求 25-50% 安全边际 + 几十年盈利记录），Pop Mart 处于"<strong class="hi">防御型投资 / 进取型投资</strong>"边界——不属于严格的"防御型投资"（仅 5 年上市记录 + 单 IP 集中度 38.1%），但具备"<strong>进取型投资</strong>"该有的<strong>不对称回报结构</strong>（上行 +30~70%，下行 -30%，安全边际客观存在）。
+  <br><br>
+  <strong>不属于"投机"的关键依据：</strong>财务底座硬（净利率 35.2% / 净现金 137.75 亿 / 零负债）+ 估值已二次崩塌至 14x（接近 2022 熊市底）+ 反推 DCF 隐含 5 年 CAGR 仅 2-8%（远低于卖方最看空者）+ 创始团队 15 年稳定 + 业务模式持续盈利 9 年。
+</div>
+
+<!-- ============== 支柱一：深入分析 ============== -->
+<section>
+  <h2>① 深入分析 <span class="pillar-tag">支柱一</span></h2>
+
+  <h3>1.1 公司业务三句话总结</h3>
+  <p><strong class="hi">泡泡玛特（Pop Mart, 9992.HK）</strong>是中国领先的潮玩公司，2010 年成立，2020-12 在港股 IPO。商业模式：<strong>以"自有 + 签约艺术家 IP"为核心，通过盲盒、毛绒、Mega 系列、积木、乐园等多品类形态变现，以全球直营门店 + 机器人商店 + 抽盒机 + 电商平台多渠道触达</strong>。
+  截至 2025 年报，公司在 30+ 国家运营，全球员工 1 万+，注册会员 7000+ 万，签约艺术家 90+。</p>
+
+  <h3>1.2 关键财务事实（2025）</h3>
+  <div class="key-numbers">
+    <div class="kn-card"><div class="label">营收</div><div class="value">371.20 亿</div><div class="sub">YoY +184.7%</div></div>
+    <div class="kn-card"><div class="label">调整后净利</div><div class="value">130.84 亿</div><div class="sub">YoY +284.5%</div></div>
+    <div class="kn-card"><div class="label">毛利率</div><div class="value">72.1%</div><div class="sub">历史新高</div></div>
+    <div class="kn-card"><div class="label">调整后净利率</div><div class="value">35.2%</div><div class="sub">接近 LVMH 区间</div></div>
+    <div class="kn-card"><div class="label">净现金</div><div class="value">137.75 亿</div><div class="sub">零银行借款</div></div>
+    <div class="kn-card"><div class="label">海外占比</div><div class="value">43.8%</div><div class="sub">2017 0.4% 起</div></div>
+    <div class="kn-card"><div class="label">ROE</div><div class="value">60-77%</div><div class="sub">行业顶级</div></div>
+    <div class="kn-card"><div class="label">资产负债率</div><div class="value">29.4%</div><div class="sub">轻杠杆</div></div>
+  </div>
+
+  <h3>1.3 9 年完整业绩序列</h3>
+  <div id="chart-history" class="chart-tall"></div>
+  <p style="font-size: 13px; color: var(--muted);">营收 2017→2025 涨 <strong>235x</strong>；调整后净利涨 <strong>>7,800x</strong>（从 167 万到 130.84 亿）；2022 利润断崖（-42.7%）后 3 年净利率从 12.4% 反弹至 35.2%（+22.8pp）。<strong class="hi">"W 曲线" 已完整跑通一轮</strong>。</p>
+
+  <h3>1.4 IP 矩阵深度</h3>
+  <table>
+    <thead><tr><th>IP</th><th>2025 营收</th><th>占比</th><th>21→25 倍数</th><th>设计师</th><th>阶段</th></tr></thead>
+    <tbody>
+      <tr><td><strong>LABUBU / THE MONSTERS</strong></td><td>141.61 亿</td><td><strong class="hi">38.1%</strong></td><td>46.5x</td><td>Kasing Lung（比利时）</td><td>巅峰但出现衰减信号</td></tr>
+      <tr><td>SKULLPANDA</td><td>35.40 亿</td><td>9.5%</td><td>5.9x</td><td>熊喵</td><td>成熟</td></tr>
+      <tr><td>CRYBABY</td><td>29.29 亿</td><td>7.9%</td><td>new in 2023</td><td>Molly Yllom（泰国）</td><td>快速成长</td></tr>
+      <tr><td>MOLLY</td><td>28.97 亿</td><td>7.8%</td><td>4.1x</td><td>Kenny Wong</td><td>成熟稳定</td></tr>
+      <tr><td>DIMOO</td><td>27.77 亿</td><td>7.5%</td><td>4.9x</td><td>Ayan</td><td>成熟</td></tr>
+      <tr><td>Twinkle Twinkle</td><td>20.56 亿</td><td>5.5%</td><td>new in 2024</td><td>PDC 内部</td><td>爆发</td></tr>
+      <tr><td>HIRONO</td><td>17.35 亿</td><td>4.7%</td><td>33.2x</td><td>宣毅郎</td><td>成长</td></tr>
+    </tbody>
+  </table>
+  <p style="font-size: 13px; color: var(--muted);">合计 17 个艺术家 IP 营收破亿。<strong>LABUBU 集中度 38.1% 是双刃剑</strong>：是收入引擎也是单点风险——但底下 7 个 IP 都过 10 亿，矩阵厚度仍在。</p>
+
+  <h3>1.5 治理与创始团队稳定性</h3>
+  <ul style="font-size: 14px;">
+    <li><strong>王宁</strong>（创始人 / CEO，43.58% 持股）— 2010 创立至今 15 年</li>
+    <li><strong>杨涛</strong>（王宁妻子，VP 主管 IP 运营 + 产品研发）— 2010 至今</li>
+    <li><strong>刘冉</strong>（执董 / VP 线下，西亚斯本科同学，9.23% 持股）— 2011 至今</li>
+    <li><strong>司德</strong>（执董 / co-COO 国内，2.02%）— 2017 至今 8 年</li>
+    <li><strong>文德一</strong>（执董 / co-COO 海外，0.09%）— 2018 至今 7 年</li>
+    <li><strong>吴越</strong>（独立 NED，LVMH 中国区总裁）— 2026 新加入</li>
+  </ul>
+
+  <div class="verdict verdict-safe">
+    <h4>✓ 支柱一判断</h4>
+    深入分析的<strong>原材料齐备</strong>：4 份年报序列（2020/2021/2023/2024/2025）+ 招股书 + 2 次创始人长访谈 + 67 个月度股价 + 卖方覆盖 + 行业研报。<strong class="bull">支柱一成立</strong>。
+  </div>
+</section>
+
+<!-- ============== 支柱二：本金安全 ============== -->
+<section>
+  <h2>② 本金安全 <span class="pillar-tag">支柱二</span></h2>
+
+  <h3>2.1 资产负债表的"硬安全"</h3>
+  <table>
+    <thead><tr><th>指标</th><th>2025-12-31</th><th>含义</th></tr></thead>
+    <tbody>
+      <tr><td>银行借款</td><td><strong class="bull">0</strong></td><td>无利息支出压力 / 抗利率周期</td></tr>
+      <tr><td>净现金</td><td><strong>137.75 亿</strong></td><td>占当前市值 6.7%</td></tr>
+      <tr><td>流动比率</td><td>~4.5</td><td>短期偿债无压力</td></tr>
+      <tr><td>资产负债率</td><td>29.4%</td><td>轻杠杆运营</td></tr>
+      <tr><td>派息记录</td><td>2025 派息率 24.4%</td><td>政策"不少于 20%"已兑现 5 年</td></tr>
+    </tbody>
+  </table>
+  <p style="font-size: 13.5px;"><strong class="hi">资产负债表的"硬安全"维度</strong>，Pop Mart 在港股消费板块中处于<strong>前 10% 分位</strong>——这是格雷厄姆视角下"本金安全"的<strong>第一道防线</strong>。</p>
+
+  <h3>2.2 估值安全边际（多视角交叉）</h3>
+  <div id="chart-safety" class="chart"></div>
+  <table>
+    <thead><tr><th>视角</th><th>当前指标</th><th>判断</th></tr></thead>
+    <tbody>
+      <tr><td>PE 倍数</td><td>14-15x</td><td><strong class="bull">上市以来 15-25 分位</strong>（接近 2022 熊市底 15-20x）</td></tr>
+      <tr><td>反推 DCF（r=10%）</td><td>隐含 5 年 CAGR <strong>2-3%</strong></td><td>市场未给任何超额增长溢价</td></tr>
+      <tr><td>反推 DCF（r=12%，含 IP 单点风险溢价）</td><td>隐含 g <strong>7-8%</strong></td><td>比 Bernstein 最看空者还低 12-17pp</td></tr>
+      <tr><td>PEG</td><td>0.7-0.95</td><td>林奇基准 &lt;1 = 低估</td></tr>
+      <tr><td>历史股价分位</td><td>HK$152.40 距 2025-08 峰值 -55%</td><td>已二次崩塌</td></tr>
+    </tbody>
+  </table>
+  <div class="verdict verdict-safe">
+    <h4>✓ 多视角一致指向"安全边际客观存在"</h4>
+    用 r=12%（含 IP 单点风险溢价）的严苛假设，市场已经把 Pop Mart 定价成"未来 5 年净利只能跑出 7-8% CAGR"——<strong>而管理层指引 ≥20%、卖方共识 +15-25%、Bernstein 看空者 &lt;20%</strong>。任何一个口径兑现，安全边际就显现。
+  </div>
+
+  <h3>2.3 抗周期能力的实证（2022 利润断崖反弹）</h3>
+  <p>2022 年净利率从 22.3% 跌到 12.4%（-9.9pp，单年利润 -42.7%）—— <strong>这是 Pop Mart 上市后真正经历过的"压力测试"</strong>。3 年后（2025）净利率回升至 35.2%，<strong>不仅完全恢复，还创历史新高</strong>。但需要 caveat：这次反弹很大程度上靠 LABUBU 单 IP 出圈，未必能复制。</p>
+
+  <h3>2.4 下行风险量化（Bernstein 看空情形）</h3>
+  <table>
+    <thead><tr><th>看空情形条件</th><th>对应股价</th><th>从当前下行</th></tr></thead>
+    <tbody>
+      <tr><td>LABUBU 销量回吐 -20%</td><td>HK$130-140</td><td>-15~ -18%</td></tr>
+      <tr><td>+ 净利率跌破 30%（高基数反转）</td><td>HK$120</td><td>-21%</td></tr>
+      <tr><td>+ 第二梯队 IP 都不破 50 亿</td><td><strong class="hi">HK$110</strong>（Bernstein 隐含目标）</td><td><strong>-28%</strong></td></tr>
+      <tr><td>+ 北美 -30%+ 严重失速（Q1 已间接证伪）</td><td>HK$80-90</td><td>-41~-47%</td></tr>
+    </tbody>
+  </table>
+
+  <div class="verdict verdict-warn">
+    <h4>⚠ 支柱二判断：本金安全<strong>有条件成立</strong></h4>
+    多视角交叉表明安全边际客观存在，但下行风险并非为零。
+    <strong>三个条件至少任意两个必须成立，本金安全才稳固</strong>：(1) LABUBU 不归零；(2) 2026 净利率维持 ≥30%；(3) 第二梯队任一 IP 突破 50 亿。
+    <em class="caveat">⚠ 按格雷厄姆严格标准"上市 10 年以上 + 每股有形资产 + 至少 25-50% 安全边际"，Pop Mart 不属于严格的"防御型投资"——它属于"<strong>进取型投资</strong>"范围。</em>
+  </div>
+</section>
+
+<!-- ============== 支柱三：满意回报 ============== -->
+<section>
+  <h2>③ 满意回报 <span class="pillar-tag">支柱三</span></h2>
+
+  <h3>3.1 三种增长情形（概率加权）</h3>
+  <div id="chart-scenarios" class="chart"></div>
+  <table>
+    <thead><tr><th>情形</th><th>概率</th><th>2026E 营收</th><th>2026E 净利</th><th>对应股价（15x PE）</th></tr></thead>
+    <tbody>
+      <tr><td><strong class="bull">乐观（控热释放）</strong></td><td>30%</td><td>483-520 亿（+30-40%）</td><td>~170 亿</td><td>HK$235</td></tr>
+      <tr><td><strong>基准（减速 + 减法）</strong></td><td>50%</td><td>438-464 亿（+18-25%）</td><td>~147 亿（基准 32% 净利率）</td><td>HK$185</td></tr>
+      <tr><td><strong class="bear">看空（Bernstein）</strong></td><td>20%</td><td>&lt;438 亿（&lt;+18%）</td><td>~120 亿</td><td>HK$130</td></tr>
+    </tbody>
+  </table>
+  <p style="font-size: 13.5px;"><strong>概率加权期望股价 = 0.30×235 + 0.50×185 + 0.20×130 = HK$189</strong>（隐含从当前 152 上行 +24%）。
+  这<strong>就是"满意回报"的概率加权基线</strong>——12 个月 +24% 复合 = 年化 +24%。<strong class="bull">显著高于 8% 的"满意回报"基准</strong>。</p>
+
+  <h3>3.2 Q1 2026 实证已打穿所有公开口径</h3>
+  <p>2026-05-12 自愿性公告：整体 +75-80% / 中国 +100-105% / 亚太 +25-30% / 美洲 +55-60% / 欧洲 +60-65%。
+  <strong>所有公开口径（管理层 ≥20% / 卖方共识 +15-25% / Bernstein &lt;20%）全部被打穿 50-65pp</strong>。
+  <em class="caveat">⚠ caveat：Q1 是低基数季度，不能简单 ×4 外推；自愿性公告未经审核；仅区间披露。</em></p>
+
+  <h3>3.3 上行不对称：王宁"灭火" 后的释放可能性</h3>
+  <p>王宁明确披露 <strong>2025 LABUBU 25 年新品全部推到 2026 + 暂停所有线下营销 + 暂停大量合作</strong>。
+  <strong class="bull">如果是主动控热</strong>：暂停的需求未消失，2026 H1 新品集中释放可推动营收<strong>反向跳升</strong>——这种"控热后爆发"情形可能<strong>不在共识中</strong>。</p>
+
+  <h3>3.4 卖方目标价分歧</h3>
+  <p>24 家覆盖中位数目标价 <strong>HK$253.68</strong>（隐含从当前 +65%）。跨度 130~330（2.5 倍）—— <strong>极度分歧本身是信号</strong>。</p>
+
+  <div class="verdict verdict-safe">
+    <h4>✓ 支柱三判断：满意回报可期</h4>
+    概率加权期望股价 HK$189（+24%）；中位卖方目标 HK$253（+65%）；上行不对称尚未被市场完整定价。
+    <strong class="bull">支柱三在 12-24 个月时间窗口内成立</strong>。
+    <em class="caveat">⚠ 但满意回报不是无风险回报——需在支柱二条件不被打破的前提下。</em>
+  </div>
+</section>
+
+<!-- ============== 综合三支柱评分 ============== -->
+<section>
+  <h2>④ 综合三支柱评分</h2>
+  <div id="chart-radar" class="chart"></div>
+  <p style="font-size: 13.5px;">
+  本图按 0-10 评分，深入分析 = <strong>9</strong>（材料齐备，可独立判断）、本金安全 = <strong>6.5</strong>（条件性成立，下行 -28%）、满意回报 = <strong>7.5</strong>（概率加权 +24%，上行 +65% 不对称）。
+  <strong>总分 23/30，对应"进取型投资"区间</strong>（格雷厄姆按总分 ≥18 视为投资、&lt;18 视为投机）。</p>
+</section>
+
+<!-- ============== 潜在收益与风险 ============== -->
+<section>
+  <h2>⑤ 潜在收益与风险并列</h2>
+  <div class="twocol">
+    <div class="col-pro">
+      <h4>潜在收益（看多论据）</h4>
+      <ul>
+        <li><strong>财务底座硬</strong>：净利率 35.2% / 零负债 / 净现金 137.75 亿</li>
+        <li><strong>LABUBU "S 曲线"未结束</strong>：1-1.5 亿只实物 IP 持续加深用户认知；王宁/沈振宇双重论据</li>
+        <li><strong>第二梯队接力可能</strong>：SKULLPANDA 35 亿 / CRYBABY 29 亿正接近 50 亿门槛</li>
+        <li><strong>海外仍有增长空间</strong>：占比 43.8% vs 王宁愿景"GDP 占比"（中国 17%）</li>
+        <li><strong>估值已二次崩塌</strong>：14x PE 接近 2022 熊市底</li>
+        <li><strong>反推 DCF 隐含 g 仅 2-8%</strong>：极度悲观，安全边际客观存在</li>
+        <li><strong>2024-2025 决策准确率 75%</strong>：6 次拐点决策硬实证（Sonny Angel 决裂 / IP 矩阵化 / 海外坚持 / LABUBU 灭火）</li>
+        <li><strong>吴越 2026 加入董事会</strong>：LVMH"看家品类"治理升级</li>
+        <li><strong>Q1 2026 +75-80% 打穿所有公开口径</strong>：上行不对称尚未定价</li>
+        <li><strong>派息政策稳定</strong>：5 年兑现 ≥20% 派息率</li>
+      </ul>
+    </div>
+    <div class="col-con">
+      <h4>潜在风险（看空论据）</h4>
+      <ul>
+        <li><strong>LABUBU 集中度 38.1%</strong>：超过 2019 年 MOLLY 单极时代</li>
+        <li><strong>Bernstein 唯一 Sell + DB 跟进</strong>："Beanie Babies 类比"看空命题</li>
+        <li><strong>2025 高基数效应</strong>：净利率 35.2% 是历史峰值，2026 可能反转到 30-32%</li>
+        <li><strong>组织能力跨地域复制不足</strong>：海外门店"落后国内 2-3 年"</li>
+        <li><strong>组织能力跨品类复制失败</strong>：电影/游戏王宁自评"不够成功"</li>
+        <li><strong>2024-10 创始团队减持 HK$15.62 亿</strong>：高点系统性减持</li>
+        <li><strong>组织自评 70 分</strong>：2024 80 分→2025 70 分首次量化退步</li>
+        <li><strong>2026 卖方分歧 2.5x</strong>：HK$130-330 跨度极大</li>
+        <li><strong>美国关税敞口</strong>：美洲营收 18.3% 是关税最敏感区</li>
+        <li><strong>潮玩用户审美周期</strong>：可能快于运动鞋 / 奢侈品（Sanrio / Nike 类比不一定成立）</li>
+        <li><strong>盲盒监管</strong>：中国/新加坡/美国 CPSC 已落地部分</li>
+        <li><strong>仅 5 年上市记录</strong>：不满足格雷厄姆"防御型投资"10 年盈利记录硬门槛</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============== 跟踪研究清单 ============== -->
+<section>
+  <h2>⑥ 持续跟踪研究清单</h2>
+  <p>分 4 个时间频率组织。<strong class="hi">建议每周扫一次 A 类、每季扫 B 类、每年扫 C 类</strong>。</p>
+
+  <div class="checklist">
+    <h4>A 类 · 月度高频信号 <span class="freq">（最及时，可前置警报）</span></h4>
+    <ul>
+      <li><strong>月度收盘价</strong> — 跌破 HK$110（Bernstein 目标 / 减仓红线第一道）</li>
+      <li><strong>千岛 GMV / LABUBU 二手价</strong> — 二手溢价转折 = "清醒销售基线"显现</li>
+      <li><strong>美国 TikTok / 北美门店店效</strong>（Bloomberg Second Measure 等三方面板）— 持续 -30%+ 即触发减仓红线第三条</li>
+      <li><strong>卖方目标价中位数</strong> — 跌破 HK$200 = 共识转向看空</li>
+      <li><strong>Bernstein / Deutsche Bank 评级</strong> — 是否维持 Sell；第三家加入 Sell = 共识看空形成</li>
+      <li><strong>抖音电商 / 小红书 LABUBU 搜索热度</strong> — C 端心智温度高频锚</li>
+    </ul>
+  </div>
+
+  <div class="checklist">
+    <h4>B 类 · 季度披露 <span class="freq">（财务证据，滞后但准）</span></h4>
+    <ul>
+      <li><strong>Q2 / Q3 自愿性公告</strong>（~2026-08 / 2026-11）— LABUBU 灭火期实际影响</li>
+      <li><strong>2026 H1 中报</strong>（~2026-09）— ⭐ 核心检验：<strong>净利率能否 ≥30%</strong>（本报告最关键 KPI）</li>
+      <li><strong>2026 H1 LABUBU 销量</strong>（vs 2025 H2）— 减速斜率首次量化</li>
+      <li><strong>第二梯队 IP 半年营收</strong> — SKULLPANDA / CRYBABY / Twinkle 是否任一突破 25 亿半年（年化 50 亿门槛）</li>
+      <li><strong>北美毛利率 vs 国内</strong> — 差 ≥10pp 触发减仓红线第一条</li>
+      <li><strong>前五大 IP 收入披露颗粒度</strong> — 颗粒度变低本身是负向信号（减仓红线第二条）</li>
+      <li><strong>经营现金流 / FCF</strong> — 验证反推 DCF "调整后净利 ≈ FCF"代理是否仍成立</li>
+    </ul>
+  </div>
+
+  <div class="checklist">
+    <h4>C 类 · 战略与组织 <span class="freq">（年报披露，影响估值倍数中枢）</span></h4>
+    <ul>
+      <li><strong>海外占比</strong>（2026 年报）— "按合理节奏"是 +5pp 还是 +0pp</li>
+      <li><strong>海外门店标准化</strong> — 王宁 70 分组织自评是否回到 80 分；区域总部 / HR 体系披露</li>
+      <li><strong>4 头部 IP 资源聚焦结果</strong> — LABUBU / 星星人 / Molly / SKULLPANDA 单 IP 增速</li>
+      <li><strong>砍掉的业务清单</strong>（Discontinued Operations）— 王宁口径"1-2 亿业务砍掉"实证</li>
+      <li><strong>吴越加入董事会后治理升级</strong> — "看家品类 KPI"是否进入考核体系</li>
+      <li><strong>集团化业务披露</strong> — 甜品 / 家电 / Popop / 独立 IP 门店是否进入 segment reporting；任一业务破 10 亿</li>
+      <li><strong>万代 / Sanrio 减集中度对照</strong> — LABUBU 占比是否从 38.1% 主动下降</li>
+    </ul>
+  </div>
+
+  <div class="checklist">
+    <h4>D 类 · 资本面/情绪信号 <span class="freq">（反向使用，市场视角）</span></h4>
+    <ul>
+      <li><strong>内部人减持 / 公司回购</strong>（港交所披露）— 王宁/管理层减持 = 高点信号；低位回购 = 看多信号（参照林奇 SCI 四象限）</li>
+      <li><strong>港股通南向资金</strong>（周度）— 国内 vs 国际资金对 LABUBU 故事分歧</li>
+      <li><strong>调整后净利率</strong>（季度）— 跌破 30% = "高基数效应反转"实证</li>
+      <li><strong>段永平公开发言</strong> — 中国价值投资圈共识参考</li>
+      <li><strong>盲盒监管动态</strong> — 中国 / 新加坡 / 美国 CPSC 新规</li>
+    </ul>
+  </div>
+
+  <div class="verdict verdict-risk">
+    <h4>✗ 减仓 / 出局触发条件（事先承诺，纪律性）</h4>
+    任意 <strong>2 条同时触发</strong>即重新评估持仓：
+    <ol style="margin: 4px 0; padding-left: 20px;">
+      <li>2026 H1 中报<strong>调整后净利率跌破 30%</strong></li>
+      <li><strong>北美毛利率比国内低 10pp+</strong> → "海外高定价权"故事不成立</li>
+      <li>前五大 IP 收入占比下降 + LABUBU/Molly/SKULLPANDA <strong>绝对值不再增长</strong> → 公司向"渠道商"漂移</li>
+      <li>Bloomberg-Bernstein 联合预警的<strong>北美收入 -30%+</strong>被官方数据证实</li>
+      <li>股价跌破 HK$110 + 创始团队<strong>无回购动作</strong>护盘</li>
+      <li>SKULLPANDA / CRYBABY / Twinkle <strong>三个 IP 全部 H1 同比转负</strong></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ============== 验证窗口时间线 ============== -->
+<section>
+  <h2>⑦ 验证窗口时间线</h2>
+  <table>
+    <thead><tr><th>时点</th><th>事件</th><th>检验什么</th></tr></thead>
+    <tbody>
+      <tr><td><strong>2026-08 前后</strong></td><td>2026 H1 中报</td><td>⭐ <strong>三条减仓红线首次实证</strong> + 净利率维持力 + LABUBU 销量减速斜率</td></tr>
+      <tr><td>2026 夏</td><td>POPLAND 二期完工</td><td>第二曲线兑现 / 王宁"线下乐园" 投入回报</td></tr>
+      <tr><td>2026-2027</td><td>Sony × Paul King LABUBU 电影</td><td>"内容化"赌注成败 / 跨品类组织能力</td></tr>
+      <tr><td>2026 中</td><td>段永平后续公开定调</td><td>中国价值投资圈共识形成 / 王宁访谈触发因素</td></tr>
+      <tr><td>2027</td><td>第二梯队任一破 50 亿</td><td>IP 运营能力跨 IP 复制 = 组织价值实证</td></tr>
+      <tr><td>2027-2028</td><td>海外门店运营标准化</td><td>跨地域组织能力建立</td></tr>
+      <tr><td><strong>2028-2030</strong></td><td>LABUBU 出现下行周期时第二曲线接力</td><td>⭐ <strong>"组织价值"终极检验</strong></td></tr>
+      <tr><td>2030+</td><td>复制 Hello Kitty 减集中度路径</td><td>长期组织韧性</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ============== 综合结论 ============== -->
+<section>
+  <h2>⑧ 综合结论</h2>
+  <div class="verdict verdict-warn">
+    <h4>⚖ 投资 vs 投机 — 三支柱判断</h4>
+    <p style="margin: 4px 0;">
+    Pop Mart 在当前价位（<strong>HK$152.40 / PE ~15x</strong>）符合格雷厄姆"投资"定义的<strong>2 项</strong>（深入分析 + 满意回报），<strong>本金安全</strong>条件性成立。
+    总体判断：<strong class="hi">属于"进取型投资"范围（非"防御型投资"）</strong>——具备客观存在的安全边际 + 不对称回报，但要求投资者：</p>
+    <ol style="margin: 6px 0; padding-left: 20px;">
+      <li>承担 -28~-47% 的下行风险（看空情形）</li>
+      <li>持续跟踪 6 项跟踪指标</li>
+      <li>持仓周期 ≥ 12-24 个月才能让上行不对称充分兑现</li>
+      <li>仓位控制在投资组合的 <strong>5-15%</strong>（建议非核心仓位）</li>
+    </ol>
+  </div>
+
+  <div class="verdict verdict-safe">
+    <h4>✓ 三支柱评分汇总</h4>
+    <table style="margin: 0;">
+      <tr><td><strong>支柱一 · 深入分析</strong></td><td><strong class="bull">9 / 10</strong></td><td>22 份一手 wiki 来源 + 完整 9 年序列 + 67 个月股价</td></tr>
+      <tr><td><strong>支柱二 · 本金安全</strong></td><td><strong>6.5 / 10</strong></td><td>条件性成立；硬资产负债表 + 软单 IP 集中度</td></tr>
+      <tr><td><strong>支柱三 · 满意回报</strong></td><td><strong class="bull">7.5 / 10</strong></td><td>概率加权 +24% / 卖方中位 +65% / 上行不对称尚未定价</td></tr>
+      <tr><td><strong>总分</strong></td><td><strong class="hi">23 / 30</strong></td><td>≥18 视为投资，<strong>属于"进取型投资"</strong></td></tr>
+    </table>
+  </div>
+</section>
+
+<div class="disclaimer">
+  <strong>免责声明：</strong>本报告综合 wiki 内 22 份一手来源（4 份年报序列 + 招股书 + 2 次创始人长访谈 + Yahoo Finance 月度行情 + 卖方覆盖 + 同业对照）。所有数字均带来源链接。
+  <strong>报告</strong>仅作为投资<strong>研究方法论参考</strong>，不构成买卖建议。任何投资决策应基于个人风险承受能力、投资组合配置和独立尽职调查。
+  港股市场存在汇率风险、政策风险、信息披露差异风险，请谨慎评估。
+  <strong>本报告作者及 wiki 维护者不对基于本报告的任何投资决策结果负责。</strong>
+</div>
+
+<footer>
+  <strong>本报告基于的 wiki 来源（22 份）：</strong><br>
+  <code>wiki/financials/2017-2019-pre-ipo.md</code> ·
+  <code>2024-annual.md</code> ·
+  <code>2025-annual.md</code> ·
+  <code>revenue-by-ip.md</code> ·
+  <code>revenue-by-region.md</code> ·
+  <code>revenue-by-category.md</code> ·
+  <code>valuation-history.md</code> ·
+  <code>implied-growth-dcf.md</code> ·
+  <code>growth-outlook.md</code> ·
+  <code>2026-展望与估值判断.md</code> ·
+  <code>insider-selling.md</code> ·
+  <code>peer-comparison.md</code><br>
+  <code>wiki/concepts/品牌价值评估框架.md</code> ·
+  <code>组织价值评估.md</code> ·
+  <code>下一个-labubu.md</code> ·
+  <code>beanie-babies-analogy.md</code> ·
+  <code>analyst-questions.md</code><br>
+  <code>wiki/sources/2026-05-06-再访王宁.md</code> ·
+  <code>2026-05-16-9992-月度行情.md</code> ·
+  <code>2026-05-12-q1-2026-业务状况.md</code> ·
+  <code>2026-04-28-popmart-lynch-lens.md</code> ·
+  <code>2026-04-21-2025-annual-report.md</code><br><br>
+  <strong>报告日期：</strong>2026-05-16 · 基准股价 HK$152.40 / PE-TTM 14.6x · 数据将随 H1 中报更新
+</footer>
+
+</div>
+
+<script>
+const isMobile = () => window.matchMedia('(max-width: 700px)').matches;
+const charts = [];
+
+// 1.3 9 年业绩序列
+function makeHistory() {
+  const m = isMobile();
+  const years = ['2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024', '2025'];
+  return {
+    tooltip: { trigger: 'axis', confine: true },
+    legend: { top: 0, data: ['营收', '调整后净利', '调整后净利率'], textStyle: { fontSize: m ? 11 : 12 } },
+    grid: { left: m ? 42 : 60, right: m ? 42 : 70, top: m ? 36 : 40, bottom: 32 },
+    xAxis: { type: 'category', data: years, axisLabel: { fontSize: m ? 10 : 12 } },
+    yAxis: [
+      { type: 'value', name: m ? '' : '亿元', position: 'left', axisLabel: { fontSize: m ? 10 : 12 } },
+      { type: 'value', name: m ? '' : '净利率 %', position: 'right', axisLabel: { formatter: '{value}%', fontSize: m ? 10 : 12 } }
+    ],
+    series: [
+      { name: '营收', type: 'bar', yAxisIndex: 0,
+        data: [1.58, 5.15, 16.83, 25.13, 44.91, 46.17, 63.01, 130.38, 371.20],
+        itemStyle: { color: '#c8332e' } },
+      { name: '调整后净利', type: 'bar', yAxisIndex: 0,
+        data: [0.017, 1.00, 4.69, 5.91, 10.02, 5.74, 11.91, 34.03, 130.84],
+        itemStyle: { color: '#b8860b' } },
+      { name: '调整后净利率', type: 'line', yAxisIndex: 1, smooth: true,
+        data: [1.1, 19.5, 27.9, 23.5, 22.3, 12.4, 18.9, 26.1, 35.2],
+        itemStyle: { color: '#2d6a4f' }, lineStyle: { width: 2.5 },
+        markPoint: m ? { data: [] } : {
+          data: [
+            { coord: ['2022', 12.4], value: '断崖', itemStyle: { color: '#c8332e' } },
+            { coord: ['2025', 35.2], value: '新高', itemStyle: { color: '#2d6a4f' } }
+          ],
+          label: { fontSize: 10, color: '#fff' }
+        }
+      }
+    ]
+  };
+}
+
+// 2.2 安全边际多视角
+function makeSafety() {
+  const m = isMobile();
+  return {
+    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, confine: true },
+    grid: { left: m ? 110 : 140, right: m ? 30 : 50, top: 20, bottom: 30 },
+    xAxis: { type: 'value', axisLabel: { fontSize: m ? 10 : 12 } },
+    yAxis: {
+      type: 'category',
+      data: [
+        '反推 DCF (r=10%)',
+        '反推 DCF (r=12%)',
+        'Bernstein 看空',
+        '中金/大摩保守',
+        '卖方共识中位',
+        '管理层指引',
+        'Q1 2026 实证'
+      ],
+      axisLabel: { fontSize: m ? 10 : 12 }
+    },
+    series: [{
+      type: 'bar',
+      data: [
+        { value: 2.5, itemStyle: { color: '#1d4e89' } },
+        { value: 7.5, itemStyle: { color: '#1d4e89' } },
+        { value: 18, itemStyle: { color: '#b8860b' } },
+        { value: 16.5, itemStyle: { color: '#b8860b' } },
+        { value: 20, itemStyle: { color: '#2d6a4f' } },
+        { value: 20, itemStyle: { color: '#2d6a4f' } },
+        { value: 77.5, itemStyle: { color: '#c8332e' } }
+      ],
+      label: { show: true, position: 'right', formatter: '{c}%', fontSize: m ? 10 : 11 }
+    }]
+  };
+}
+
+// 3.1 三种情形概率加权
+function makeScenarios() {
+  const m = isMobile();
+  return {
+    tooltip: { trigger: 'item', formatter: '{b}<br/>概率 {c}%', confine: true },
+    legend: { bottom: 0, textStyle: { fontSize: m ? 11 : 12 } },
+    series: [{
+      type: 'pie',
+      radius: m ? ['38%', '62%'] : ['42%', '68%'],
+      center: ['50%', m ? '44%' : '50%'],
+      data: [
+        { value: 30, name: '乐观（控热释放 +30-40%）→ HK$235', itemStyle: { color: '#2d6a4f' } },
+        { value: 50, name: '基准（减速+减法 +18-25%）→ HK$185', itemStyle: { color: '#b8860b' } },
+        { value: 20, name: '看空（Bernstein <+18%）→ HK$130', itemStyle: { color: '#c8332e' } }
+      ],
+      label: { formatter: '{d}%', fontSize: m ? 11 : 13, fontWeight: 600 }
+    }]
+  };
+}
+
+// 4 三支柱雷达
+function makeRadar() {
+  const m = isMobile();
+  return {
+    tooltip: { confine: true },
+    radar: {
+      center: ['50%', '52%'],
+      radius: m ? '60%' : '68%',
+      indicator: [
+        { name: '深入分析', max: 10 },
+        { name: '本金安全', max: 10 },
+        { name: '满意回报', max: 10 }
+      ],
+      axisName: { fontSize: m ? 12 : 14, color: '#1a1a1a', fontWeight: 600 },
+      splitArea: { areaStyle: { color: ['#fafaf7', '#fff'] } },
+      splitNumber: 5
+    },
+    series: [{
+      type: 'radar',
+      data: [
+        {
+          name: 'Pop Mart 评分',
+          value: [9, 6.5, 7.5],
+          itemStyle: { color: '#c8332e' },
+          areaStyle: { color: 'rgba(200,51,46,0.25)' },
+          lineStyle: { width: 2.5 },
+          label: { show: true, fontSize: m ? 11 : 13, fontWeight: 600, formatter: '{c}' }
+        },
+        {
+          name: '格雷厄姆"投资"最低门槛',
+          value: [6, 6, 6],
+          itemStyle: { color: '#888' },
+          lineStyle: { width: 1.5, type: 'dashed' }
+        }
+      ]
+    }],
+    legend: { top: 0, textStyle: { fontSize: m ? 11 : 12 } }
+  };
+}
+
+function init(id, factory) {
+  const inst = echarts.init(document.getElementById(id));
+  inst.setOption(factory(), true);
+  charts.push({ inst, factory });
+}
+init('chart-history', makeHistory);
+init('chart-safety', makeSafety);
+init('chart-scenarios', makeScenarios);
+init('chart-radar', makeRadar);
+
+let lastMobile = isMobile();
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    const nowMobile = isMobile();
+    if (nowMobile !== lastMobile) {
+      lastMobile = nowMobile;
+      charts.forEach(({ inst, factory }) => inst.setOption(factory(), true));
+    } else {
+      charts.forEach(({ inst }) => inst.resize());
+    }
+  }, 150);
+});
+</script>
+</body>
+</html>

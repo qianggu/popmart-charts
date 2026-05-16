@@ -164,6 +164,13 @@
     <div class="legend-note">数据时点 2024-01-10；来源：开源证券行业报告。</div>
   </div>
 
+  <div class="card grid-full">
+    <h2>⑪ 月度收盘价 + 估算市值（2020-12 → 2026-05）</h2>
+    <div class="desc">67 个月度数据点，覆盖 IPO 至今。首次月度收盘回到 IPO 月（81.90）耗时 47 个月，到 2024-11 才发生。两次完整估值周期可见。</div>
+    <div id="chart-monthly" class="chart chart-tall"></div>
+    <div class="legend-note">月度收盘价来源 Yahoo Finance；市值 = 收盘 × 已发行股本（2020-2022 用 1,402M / 2023-2024 用 1,378M / 2025 起用 1,341M，与回购节奏对齐）。</div>
+  </div>
+
 </div>
 
 <footer>
@@ -172,7 +179,8 @@
   <code>wiki/financials/2025-annual.md</code> ·
   <code>wiki/financials/revenue-by-ip.md</code> ·
   <code>wiki/financials/revenue-by-region.md</code> ·
-  <code>wiki/financials/valuation-history.md</code><br>
+  <code>wiki/financials/valuation-history.md</code> ·
+  <code>wiki/sources/2026-05-16-9992-月度行情.md</code><br>
   渲染：ECharts 5.5（CDN）。
 </footer>
 
@@ -463,6 +471,87 @@ function makePeerPE() {
   };
 }
 
+function makeMonthly() {
+  const m = isMobile();
+  // 67 个月度数据点（来源 Yahoo Finance，sources/2026-05-16-9992-月度行情.md）
+  const months = [
+    '2020-12','2021-01','2021-02','2021-03','2021-04','2021-05','2021-06','2021-07','2021-08','2021-09','2021-10','2021-11','2021-12',
+    '2022-01','2022-02','2022-03','2022-04','2022-05','2022-06','2022-07','2022-08','2022-09','2022-10','2022-11','2022-12',
+    '2023-01','2023-02','2023-03','2023-04','2023-05','2023-06','2023-07','2023-08','2023-09','2023-10','2023-11','2023-12',
+    '2024-01','2024-02','2024-03','2024-04','2024-05','2024-06','2024-07','2024-08','2024-09','2024-10','2024-11','2024-12',
+    '2025-01','2025-02','2025-03','2025-04','2025-05','2025-06','2025-07','2025-08','2025-09','2025-10','2025-11','2025-12',
+    '2026-01','2026-02','2026-03','2026-04','2026-05'
+  ];
+  const close = [
+    81.90,74.00,89.90,59.35,64.30,69.50,77.00,56.90,58.75,53.25,45.95,53.90,44.85,
+    38.50,39.15,34.40,36.20,30.25,37.90,18.00,20.45,14.44,10.16,17.34,19.82,
+    25.35,21.80,21.40,18.94,17.20,17.42,21.95,25.50,23.15,21.55,23.45,20.25,
+    17.52,19.58,28.75,33.90,37.10,38.25,41.45,45.85,53.25,70.50,89.85,90.00,
+    93.90,104.20,156.50,193.80,220.40,266.60,246.00,322.40,266.80,221.60,224.80,189.30,
+    223.60,229.80,143.60,157.20,152.40
+  ];
+  // 估算市值（亿港币）：分段股本
+  const sharesFor = (i) => {
+    if (i <= 24) return 1402;        // 2020-12 ~ 2022-12
+    if (i <= 48) return 1378;        // 2023-01 ~ 2024-12
+    return 1341;                      // 2025-01 ~
+  };
+  const mcap = close.map((p, i) => +(p * sharesFor(i) / 100).toFixed(0));
+  return {
+    tooltip: {
+      trigger: 'axis', confine: true,
+      formatter: (params) => {
+        const i = params[0].dataIndex;
+        return `<b>${months[i]}</b><br>收盘：HK$${close[i]}<br>估算市值：HK$${mcap[i]} 亿`;
+      }
+    },
+    legend: { top: 0, data: ['月度收盘价', '估算市值'], textStyle: { fontSize: m ? 11 : 12 } },
+    grid: { left: m ? 40 : 60, right: m ? 40 : 70, top: m ? 36 : 40, bottom: m ? 50 : 50 },
+    xAxis: {
+      type: 'category', data: months,
+      axisLabel: {
+        fontSize: m ? 9 : 11,
+        interval: m ? 11 : 5,
+        rotate: m ? 30 : 0
+      },
+      boundaryGap: false
+    },
+    yAxis: [
+      { type: 'value', name: m ? '' : 'HK$', position: 'left', axisLabel: { fontSize: m ? 10 : 12 } },
+      { type: 'value', name: m ? '' : '市值(亿)', position: 'right', axisLabel: { fontSize: m ? 10 : 12 } }
+    ],
+    series: [
+      {
+        name: '月度收盘价', type: 'line', yAxisIndex: 0, smooth: true,
+        data: close, itemStyle: { color: '#c8332e' }, lineStyle: { width: 2 },
+        symbol: 'none',
+        areaStyle: { color: 'rgba(200,51,46,0.08)' },
+        markPoint: {
+          symbol: 'pin', symbolSize: m ? 38 : 52,
+          label: { fontSize: m ? 9 : 11, color: '#fff' },
+          data: [
+            { coord: ['2020-12', 81.90], value: 'IPO', itemStyle: { color: '#2d6a4f' } },
+            { coord: ['2022-10', 10.16], value: '低点', itemStyle: { color: '#1d4e89' } },
+            { coord: ['2025-08', 322.40], value: '峰值', itemStyle: { color: '#c8332e' } },
+            { coord: ['2026-03', 143.60], value: '年报跌', itemStyle: { color: '#b8860b' } }
+          ]
+        },
+        markLine: {
+          symbol: 'none',
+          lineStyle: { color: '#888', type: 'dashed', width: 1 },
+          label: { fontSize: m ? 9 : 10, color: '#888', position: 'insideEndTop' },
+          data: [{ yAxis: 81.90, name: 'IPO 月 81.90' }]
+        }
+      },
+      {
+        name: '估算市值', type: 'line', yAxisIndex: 1, smooth: true,
+        data: mcap, itemStyle: { color: '#6a4c93' }, lineStyle: { width: 1.5, type: 'dotted' },
+        symbol: 'none'
+      }
+    ]
+  };
+}
+
 const chartDefs = [
   ['chart-revenue', makeRevenue],
   ['chart-margin', makeMargin],
@@ -473,7 +562,8 @@ const chartDefs = [
   ['chart-q1-2026', makeQ12026],
   ['chart-price-pe', makePricePE],
   ['chart-targets', makeTargets],
-  ['chart-peer-pe', makePeerPE]
+  ['chart-peer-pe', makePeerPE],
+  ['chart-monthly', makeMonthly]
 ];
 
 function renderAll() {

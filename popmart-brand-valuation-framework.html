@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#c8332e">
+<title>泡泡玛特品牌价值评估框架（4 层硬度递减）</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+  :root {
+    --bg: #fafaf7;
+    --ink: #1a1a1a;
+    --muted: #6b6b6b;
+    --line: #e0ddd5;
+    --accent: #c8332e;
+    --accent-soft: #fdf8f6;
+    --bull: #2d6a4f;
+    --bear: #b8860b;
+    --paper: #ffffff;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+                 "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 40px 28px 80px; }
+
+  header {
+    border-bottom: 3px solid var(--accent);
+    padding-bottom: 24px;
+    margin-bottom: 32px;
+  }
+  header .eyebrow {
+    color: var(--accent);
+    font-size: 12px;
+    letter-spacing: 2px;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  header h1 {
+    font-size: 30px;
+    margin: 0 0 10px;
+    letter-spacing: -0.5px;
+    line-height: 1.3;
+  }
+  header .sub { color: var(--muted); font-size: 13px; line-height: 1.6; }
+  header .nav { margin-top: 14px; font-size: 13px; }
+  header .nav a { color: var(--accent); text-decoration: none; margin-right: 14px; }
+  header .nav a:hover { text-decoration: underline; }
+
+  section { margin-bottom: 42px; }
+  section h2 {
+    font-size: 20px;
+    margin: 0 0 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--line);
+    letter-spacing: -0.3px;
+  }
+  section h3 { font-size: 16px; margin: 22px 0 8px; }
+
+  .tldr {
+    background: var(--accent-soft);
+    border-left: 4px solid var(--accent);
+    padding: 16px 20px 14px;
+    margin-bottom: 32px;
+    border-radius: 0 6px 6px 0;
+  }
+  .tldr h3 { margin-top: 0; color: var(--accent); font-size: 14px; letter-spacing: 1px; text-transform: uppercase; }
+  .tldr p { margin: 8px 0; font-size: 14px; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0;
+    font-size: 13.5px;
+  }
+  th, td {
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+  th { background: #f4f0e8; font-weight: 600; font-size: 13px; }
+  td.tag-bad { color: #999; }
+  td.tag-bad::before { content: '✗ '; color: #c8332e; font-weight: bold; }
+  td.tag-good::before { content: '✓ '; color: var(--bull); font-weight: bold; }
+
+  .chart { width: 100%; height: 380px; margin: 12px 0; }
+
+  .pillar {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 18px 22px;
+    margin-bottom: 14px;
+    position: relative;
+  }
+  .pillar h3 {
+    margin: 0 0 8px;
+    font-size: 17px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .pillar .label {
+    display: inline-block;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 3px;
+    background: var(--accent);
+    color: #fff;
+    letter-spacing: 1px;
+    font-weight: 600;
+  }
+  .pillar .meta { color: var(--muted); font-size: 12px; margin-bottom: 8px; }
+  .pillar.A { border-left: 5px solid #2d6a4f; }
+  .pillar.B { border-left: 5px solid #1d4e89; }
+  .pillar.C { border-left: 5px solid #b8860b; }
+  .pillar.D { border-left: 5px solid #c8332e; }
+  .pillar.A .label { background: #2d6a4f; }
+  .pillar.B .label { background: #1d4e89; }
+  .pillar.C .label { background: #b8860b; }
+  .pillar.D .label { background: #c8332e; }
+  .pillar ul { margin: 8px 0 4px; padding-left: 20px; }
+  .pillar li { margin-bottom: 4px; font-size: 14px; }
+  .pillar .verdict { margin-top: 10px; padding: 8px 10px; background: #f8f6f0; border-radius: 4px; font-size: 13px; }
+
+  .twocol {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 14px 0;
+  }
+  .col-bull, .col-bear {
+    padding: 14px 16px;
+    border-radius: 6px;
+  }
+  .col-bull { background: #f0f8f3; border-left: 4px solid var(--bull); }
+  .col-bear { background: #fdf6e9; border-left: 4px solid var(--bear); }
+  .col-bull h4, .col-bear h4 { margin: 0 0 6px; font-size: 14px; }
+  .col-bull h4 { color: var(--bull); }
+  .col-bear h4 { color: var(--bear); }
+  .col-bull ul, .col-bear ul { margin: 4px 0; padding-left: 18px; font-size: 13px; }
+
+  .caveat {
+    background: #fdf6e9;
+    border-left: 4px solid var(--bear);
+    padding: 12px 16px;
+    margin: 14px 0;
+    border-radius: 0 4px 4px 0;
+    font-size: 13.5px;
+  }
+  .caveat strong { color: var(--bear); }
+
+  .quote {
+    border-left: 3px solid #aaa;
+    padding-left: 14px;
+    color: #444;
+    margin: 12px 0;
+    font-size: 14px;
+    font-style: italic;
+  }
+
+  .checklist {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 16px 20px;
+    margin: 12px 0;
+  }
+  .checklist h4 { margin: 0 0 8px; font-size: 14px; color: var(--accent); }
+  .checklist ul { margin: 0; padding-left: 20px; font-size: 13.5px; }
+  .checklist li { margin-bottom: 5px; }
+
+  footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 12px;
+    word-break: break-all;
+  }
+  footer code { background: #f0ece4; padding: 1px 6px; border-radius: 3px; font-size: 11px; }
+  footer a { color: var(--accent); text-decoration: none; }
+
+  strong.hi { color: var(--accent); }
+  strong.bull { color: var(--bull); }
+  strong.bear { color: var(--bear); }
+
+  @media (max-width: 700px) {
+    body { font-size: 14px; line-height: 1.65; }
+    .wrap { padding: 24px 14px 60px; }
+    header h1 { font-size: 22px; line-height: 1.35; }
+    header .sub { font-size: 12px; }
+    section h2 { font-size: 18px; }
+    section h3 { font-size: 15px; }
+    .pillar { padding: 14px 16px; }
+    .pillar h3 { font-size: 15px; }
+    .pillar li { font-size: 13px; }
+    .twocol { grid-template-columns: 1fr; gap: 12px; }
+    table { font-size: 12.5px; }
+    th, td { padding: 8px 8px; }
+    .chart { height: 320px; }
+    .tldr p { font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">POP MART · 9992.HK · 估值方法论</div>
+  <h1>泡泡玛特品牌价值评估框架</h1>
+  <div class="sub">
+    4 层硬度递减 · "LABUBU 是否持续" 提法重构 · 看多 vs 看空并列论据。<br>
+    一手来源：王宁 2026 初访谈（李翔）+ 2025 年报 + 千岛沈振宇 + 林奇 Lens + Bernstein 看空 + 4 份年报序列。
+  </div>
+  <div class="nav">
+    <a href="./">← 历史趋势图表</a>
+    <a href="popmart-historical-dimensions.html">分析维度</a>
+  </div>
+</header>
+
+<div class="tldr">
+  <h3>TL;DR</h3>
+  <p>外界对泡泡玛特估值的最大焦点常被表述为 <strong class="hi">"LABUBU 销售能否持续？"</strong>——但这个提法<strong>看上去重要、实际错位</strong>。</p>
+  <p>王宁本人公开"不担心 LABUBU 持续"（关心的是组织）；沈振宇说"现象级 IP 不会归零"；Bernstein 说"Beanie Babies 类比"。三方打的不是同一场仗——王宁/沈振宇回答<strong>存在性</strong>问题，Bernstein 担心<strong>清醒销售基线</strong>问题。</p>
+  <p>真正驱动估值波动的是另外三件事：<strong class="hi">LABUBU 减速斜率</strong> / <strong class="hi">第二梯队能否破 50 亿门槛</strong> / <strong class="hi">组织能力能否撑起全球化+集团化双战略</strong>。</p>
+</div>
+
+<section>
+  <h2>① 核心问题重构：真问题 vs 伪问题</h2>
+  <p>同样是问"LABUBU 是否持续"，不同提法的可证伪性差很多。先把伪问题剥离出去，让分析精力聚焦在能动的变量上。</p>
+  <table>
+    <thead>
+      <tr><th style="width:30%">提法</th><th style="width:18%">性质</th><th>判断依据</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="tag-bad">LABUBU 会不会<strong>归零</strong></td>
+        <td><strong class="bear">伪问题</strong></td>
+        <td>1–1.5 亿只实物在用户家中（王宁 2026 初口径）—— 存在性已确定；沈振宇 "真粉丝托底" + 王宁 "实物 IP 持续加深认知" 双重论据。</td>
+      </tr>
+      <tr>
+        <td class="tag-good">LABUBU 会不会<strong>回吐</strong></td>
+        <td><strong class="hi">真问题但是节奏</strong></td>
+        <td>2026 已主动暂停新品 + 暂停线下营销 + 暂停大量合作 —— 是 "减速到什么斜率" 问题，不是命运问题。</td>
+      </tr>
+      <tr>
+        <td class="tag-good">第二梯队能否<strong>接力 50 亿</strong></td>
+        <td><strong class="hi">最该关注</strong></td>
+        <td>SKULLPANDA 35.4 亿 / CRYBABY 29.3 亿 / Twinkle Twinkle 20.6 亿 —— 距林奇阈值仍差 15–30 亿。任一突破 = 估值倍数重估上行；都不破 = LABUBU 单点依赖加剧。</td>
+      </tr>
+      <tr>
+        <td class="tag-good">组织能力能否<strong>撑住</strong></td>
+        <td><strong class="hi">最该关注</strong></td>
+        <td>王宁 2025 自评 <strong>70 分</strong>（vs 2024 80 分）；海外门店运营 "还是 2-3 年前国内水平"；1 万人组织 "千里之堤溃于蚁穴"。</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="caveat">
+    <strong>提醒：</strong>王宁的 "不担心 LABUBU" 和 Bernstein 的 "Beanie Babies 类比" <strong>并非真正交锋</strong>。
+    王宁回答 "实物 IP 会不会消失"（存在性），Bernstein 担心 "投机泡沫破后真粉丝清醒销售基线在哪里"（节奏）。
+    两者打在不同的维度上 —— 把 "王宁不担心" 直接拿来反驳 Bernstein 是逻辑错位。
+  </div>
+</section>
+
+<section>
+  <h2>② 4 层硬度递减评估框架</h2>
+  <p>按 "可量化程度 + 可证伪程度" 从高到低排列。<strong>硬度越高的层，越不可争议</strong>（财务底座是估值下限锚）；<strong>越软的层，越是估值倍数的来源</strong>（品牌叙事决定 PE 倍数从 10x 到 40x 的跨度）。</p>
+  <div id="chart-pyramid" class="chart"></div>
+
+  <div class="pillar A">
+    <h3><span class="label">A 层</span>财务底座 <span class="meta" style="margin-left:auto">最硬 · 估值下限锚</span></h3>
+    <div class="meta">来源：2025 年报 + Q1 2026 自愿性公告</div>
+    <ul>
+      <li>营收 <strong>371.20 亿</strong> / 调整后净利 <strong>130.84 亿</strong> / <strong>净利率 35.2%</strong>（已接近 LVMH 区间）</li>
+      <li>零银行借款 + 净现金 <strong>137.75 亿</strong> + 海外占比 <strong>43.8%</strong></li>
+      <li>Q1 2026 整体 YoY <strong>+75–80%</strong>（中国 +100% 仍是最快增速区）</li>
+      <li>派息率 24.4%（略高于 20% 下限，CapEx 翻倍至 11.72 亿）</li>
+    </ul>
+    <div class="verdict">
+      <strong class="bull">✓ 这一层不可争议。</strong>除非 2026 中报出现 "基本面拐点"（Bernstein 持续追踪 20+ 项高频数据未见），否则财务底座是估值下限锚。
+      <br><strong>🤔 但 35% 净利率是高位。</strong>进一步杠杆来自 "绝对值放大 + 净利率维持"，而非 "利润率扩张"。
+    </div>
+  </div>
+
+  <div class="pillar B">
+    <h3><span class="label">B 层</span>IP 资产质量 <span class="meta" style="margin-left:auto">次硬 · 增长持续性</span></h3>
+    <div class="meta">来源：5 年 IP 序列 + 王宁 2026 初聚焦战略 + 沈振宇命题</div>
+    <ul>
+      <li>⚠️ LABUBU 单 IP 占 <strong class="hi">38.1%</strong> — 比 2019 年 MOLLY 单极时代（27.1%）更集中</li>
+      <li>✓ 但 <strong>17 个艺术家 IP 破亿</strong>，矩阵厚度仍在</li>
+      <li>⭐ 王宁主动战略：资源聚焦 <strong>4 头部</strong>（LABUBU / 星星人 / MOLLY / SKULLPANDA），"比再签 10 个新 IP 更有价值"</li>
+      <li>⭐ "下一个 LABUBU" 实证：PUCKY 通过运营复活（敲敲系列） + 星星人 2025 营收 20.6 亿（+225%）</li>
+    </ul>
+    <div class="verdict">
+      <strong>🤔 关键不确定：</strong>第二梯队 IP（SKULLPANDA / CRYBABY / Twinkle / HIRONO）能否在 2026–2027 突破 <strong>50 亿元年营收</strong>。当前最高 SKULLPANDA 35.4 亿，距阈值差 14.6 亿。
+    </div>
+  </div>
+
+  <div class="pillar C">
+    <h3><span class="label">C 层</span>渠道 + 组织能力 <span class="meta" style="margin-left:auto">更软 · 下行风险源</span></h3>
+    <div class="meta">来源：王宁 2026 初访谈自评 + 海外门店运营落差描述</div>
+    <ul>
+      <li>渠道：全球全直营（不加盟） + 1,824 台机器人商店 + 抽盒机/抖音/天猫/小程序多线上</li>
+      <li>Say No 公司哲学："我们 say no 次数远大于 say yes"（主动放弃合作/授权/加盟）</li>
+      <li>⚠️ 王宁自评 <strong class="bear">组织 70 分</strong>（2024 是 80 分）— wiki 内首次量化的 "组织退步" 披露</li>
+      <li>⚠️ "海外门店运营还是 2-3 年前国内水平" — 工程质量 / 陈列 / 商品管理 / 服务运营全面落差</li>
+    </ul>
+    <div class="verdict">
+      <strong class="bear">⚠️ 组织退步是隐形信号。</strong>业绩好的时候掩盖问题，"千里之堤溃于蚁穴" — 是王宁本人最担心的维度，比业务问题更值得跟踪。
+    </div>
+  </div>
+
+  <div class="pillar D">
+    <h3><span class="label">D 层</span>品牌叙事位势 <span class="meta" style="margin-left:auto">最软 · 决定 PE 倍数</span></h3>
+    <div class="meta">来源：林奇 Lens + Bernstein 看空 + 沈振宇看多 + LVMH 借鉴</div>
+    <ul>
+      <li>LABUBU 已不只是商品 — <strong>身份表演媒介</strong>（短视频时代 "表达 → 表演" 传播学）+ "现象级实物 IP"</li>
+      <li>看多叙事："中国迪士尼" / "未来 50 年 Hello Kitty" / 实物 IP 持续加深认知</li>
+      <li>看空叙事："漂亮 50" / Beanie Babies 类比 / S 曲线进入第二阶段平台期</li>
+      <li>⭐ 治理升级：吴越（LVMH 中国区总裁）2026 加入董事会 — 引入 "看家 60% + 创新 40%" 框架（Nike 鞋款 / 香奈儿包款）</li>
+    </ul>
+    <div class="verdict">
+      <strong>当前 PE 14.6x 处于 "贵估值修正完毕、便宜叙事尚未建立" 中间态。</strong>
+      <br>估值倍数区间：中国迪士尼叙事 → 30–40x / 平台期叙事 → 15–20x / Beanie Babies 类比 → 10x 以下都贵。
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>③ 看多 vs 看空 — 5 维并列论据</h2>
+  <p>本框架<strong>不强行选边</strong>。任何 "中国迪士尼" 或 "Beanie Babies" 叙事都是<strong>信念</strong>而非结论 — 并列保留，让读者按自身风险偏好取舍。</p>
+  <div id="chart-radar" class="chart"></div>
+  <div class="twocol">
+    <div class="col-bull">
+      <h4>看多论据</h4>
+      <ul>
+        <li><strong>实物 IP 不归零</strong>：1 亿只 LABUBU 在用户家持续存在；真粉丝托底</li>
+        <li><strong>运营能力实证</strong>：PUCKY 复活 + Twinkle Twinkle 起跳</li>
+        <li><strong>集团化战略</strong>：全球化 + 集团化双轮（IPO 时即提）</li>
+        <li><strong>海外 43.8%</strong>：文德一 4 年埋种期回报；2024 美洲 +748%</li>
+        <li><strong>PE 14x 区间底</strong>：历史 15-25 分位；2024-01 "17.5x 被低估" 后被打穿 2.6x</li>
+      </ul>
+    </div>
+    <div class="col-bear">
+      <h4>看空论据</h4>
+      <ul>
+        <li><strong>存在 ≠ 复购</strong>：二手价崩塌（待跟踪千岛 GMV）</li>
+        <li><strong>规模不够</strong>：第二梯队都是次级 IP，50 亿门槛未破</li>
+        <li><strong>电影/游戏自评</strong>：王宁口径 "不够成功"；甜品/家电试错成本未量化</li>
+        <li><strong>海外运营落差</strong>：王宁自述落后国内 2-3 年；关税敞口</li>
+        <li><strong>PE 还可压缩</strong>：2025-08 峰值后；Bernstein "10x 以下都贵"</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>④ 关于 "耐克 60/40" 类比</h2>
+  <p>王宁 2026 初访谈第 11 节，<strong>吴越提出</strong>（王宁附和）：</p>
+  <div class="quote">
+    "每个品牌都得有自己看家的东西，可能每年有 60% 的东西是看家的，不需要做太大的创新，但需要把这个看家的东西不断完善，然后有 40% 要做持续的创新。比如 Nike 的鞋子，香奈儿那几款包……"
+  </div>
+  <p>这是 Pop Mart 治理层级出现的 <strong>奢侈品逻辑</strong> — "看家 IP（LABUBU / MOLLY / SKULLPANDA）持续维护 + 新品类与新 IP 创新 40%" 取代了 "广撒网造星"。</p>
+  <div class="twocol">
+    <div class="col-bull">
+      <h4>类比的合理性</h4>
+      <ul>
+        <li>Nike 经典款（Air Force 1 / Jordan）持续 30–40 年</li>
+        <li>Hermès Birkin/Kelly 持续 50+ 年</li>
+        <li>实物 IP 在用户家持续存在（与王宁 "1 亿只不消失" 同源）</li>
+        <li>减少创新失败的财务波动（"linear corporate growth" 目标）</li>
+      </ul>
+    </div>
+    <div class="col-bear">
+      <h4>类比的反驳</h4>
+      <ul>
+        <li>Nike / Hermès / 香奈儿都有<strong>百年品牌势能</strong>；LABUBU 真正出圈仅 18 个月</li>
+        <li>潮玩用户审美迭代速度<strong>快于</strong>运动鞋/奢侈品</li>
+        <li>"看家" 地位是<strong>事后</strong>才能确认 — Beanie Babies 当年也曾被视为 "看家"</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>⑤ 估值锚定（框架而非结论）</h2>
+  <p>本框架 <strong>不给目标价</strong> — 卖方目标价 130~330 跨度 2.5x 已经反映了 D 层叙事的分歧。但可以按层级给出 "锚" 与 "倍数来源"：</p>
+  <table>
+    <thead>
+      <tr><th>层级</th><th>锚</th><th>估值含义</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong style="color:#2d6a4f">A 财务底座</strong></td><td>调整后净利 130.84 亿 × 15x PE = HK$2,300 亿（≈ HK$172/股）</td><td><strong>估值下限</strong></td></tr>
+      <tr><td><strong style="color:#1d4e89">B IP 资产</strong></td><td>海外占比 + 第二梯队进度</td><td>决定<strong>增长持续性</strong></td></tr>
+      <tr><td><strong style="color:#b8860b">C 渠道+组织</strong></td><td>王宁 70 分自评</td><td><strong>下行风险源</strong></td></tr>
+      <tr><td><strong style="color:#c8332e">D 品牌叙事</strong></td><td>吴越加入 / 灭火动作 / Bernstein 维持 Sell</td><td>决定 <strong>PE 倍数（10–40x 跨度）</strong></td></tr>
+    </tbody>
+  </table>
+  <div class="caveat">
+    <strong>评估纪律 4 条：</strong>
+    <ol style="margin: 6px 0; padding-left: 20px;">
+      <li>优先关注 A 层和 B 层（硬指标 / 可量化）</li>
+      <li>C 层是下行风险的早期信号 — 王宁自评退步是 wiki 内首次明确的 "组织风险" 披露</li>
+      <li>D 层是估值倍数的来源但不可争论 — 任何 "中国迪士尼/Beanie Babies" 叙事都是<strong>信念</strong>而非结论</li>
+      <li>创始人视角 ≠ 投资者视角 — 王宁始终在做 "让市场理解公司" 工作，把他的判断当<strong>论点</strong>而非结论</li>
+    </ol>
+  </div>
+</section>
+
+<section>
+  <h2>⑥ 验证窗口</h2>
+  <div class="checklist">
+    <h4>短期（2026 H1 中报）</h4>
+    <ul>
+      <li>LABUBU 同比增速：+30%? +50%? +0%? — 主动控热的财务代价首次量化</li>
+      <li>海外门店运营标准化 — 是否有海外区域总部 + HR 体系升级披露</li>
+      <li>第二梯队 IP — SKULLPANDA / CRYBABY / Twinkle Twinkle 是否任一突破 25 亿单 IP 半年</li>
+    </ul>
+  </div>
+  <div class="checklist">
+    <h4>中期（2026 年报）</h4>
+    <ul>
+      <li>4 个头部 IP（LABUBU / 星星人 / Molly / SKULLPANDA）的资源聚焦结果</li>
+      <li>砍掉的 1–2 亿业务披露</li>
+      <li>第二梯队 IP 突破 50 亿门槛与否</li>
+    </ul>
+  </div>
+  <div class="checklist">
+    <h4>长期（2027–2030）</h4>
+    <ul>
+      <li>能否复制 Hello Kitty 减集中度路径（4 年 54.2% → 30.4%）</li>
+      <li>海外占比是否突破 60%</li>
+      <li>集团化（电影 / 游戏 / 乐园 / 甜品 / 家电 / 饰品）是否有任一业务单独贡献营收 >10 亿</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  来源（wiki 路径）：<br>
+  <code>wiki/concepts/品牌价值评估框架.md</code> ·
+  <code>wiki/sources/2026-05-06-再访王宁.md</code> ·
+  <code>wiki/concepts/beanie-babies-analogy.md</code> ·
+  <code>wiki/concepts/下一个-labubu.md</code> ·
+  <code>wiki/financials/valuation-history.md</code> ·
+  <code>wiki/financials/2025-annual.md</code><br>
+  本页面是 wiki <code>concepts/品牌价值评估框架.md</code> 的可视化版本。生成 2026-05-16。
+</footer>
+
+</div>
+
+<script>
+const isMobile = () => window.matchMedia('(max-width: 700px)').matches;
+
+// 4 层硬度金字塔 (funnel chart)
+function makePyramid() {
+  const m = isMobile();
+  return {
+    tooltip: {
+      trigger: 'item',
+      confine: true,
+      formatter: '{b}<br/><span style="color:#888;font-size:12px">{c}</span>'
+    },
+    series: [{
+      type: 'funnel',
+      left: m ? '10%' : '20%',
+      right: m ? '10%' : '20%',
+      top: 20,
+      bottom: 20,
+      width: m ? '80%' : '60%',
+      min: 0,
+      max: 100,
+      gap: 4,
+      sort: 'descending',
+      label: {
+        show: true,
+        position: 'inside',
+        fontSize: m ? 12 : 14,
+        fontWeight: 600,
+        color: '#fff'
+      },
+      labelLine: { length: 10, lineStyle: { width: 1 } },
+      itemStyle: { borderColor: '#fff', borderWidth: 2 },
+      data: [
+        { value: 95, name: 'A 财务底座', itemStyle: { color: '#2d6a4f' }, tip: '最硬 · 估值下限锚' },
+        { value: 75, name: 'B IP 资产', itemStyle: { color: '#1d4e89' }, tip: '次硬 · 增长持续性' },
+        { value: 55, name: 'C 渠道+组织', itemStyle: { color: '#b8860b' }, tip: '更软 · 下行风险源' },
+        { value: 35, name: 'D 品牌叙事', itemStyle: { color: '#c8332e' }, tip: '最软 · 决定 PE 倍数' }
+      ]
+    }],
+    graphic: m ? [] : [
+      { type: 'text', left: 30, top: '20%', style: { text: '硬\n度\n↑', fontSize: 14, fill: '#888' } },
+      { type: 'text', right: 30, top: '20%', style: { text: '可量化\n↑\n可争议\n↓', fontSize: 12, fill: '#888' } }
+    ]
+  };
+}
+
+// 5 维看多看空雷达
+function makeRadar() {
+  const m = isMobile();
+  return {
+    tooltip: { confine: true },
+    legend: {
+      top: 0,
+      data: ['看多论据强度', '看空论据强度'],
+      textStyle: { fontSize: m ? 12 : 13 }
+    },
+    radar: {
+      center: ['50%', '55%'],
+      radius: m ? '60%' : '65%',
+      indicator: [
+        { name: '实物 IP 韧性', max: 10 },
+        { name: '运营/接力实证', max: 10 },
+        { name: '海外/集团化', max: 10 },
+        { name: '估值倍数空间', max: 10 },
+        { name: '组织/治理', max: 10 }
+      ],
+      axisName: { fontSize: m ? 11 : 12, color: '#444' },
+      splitArea: { areaStyle: { color: ['#fafaf7', '#fff'] } }
+    },
+    series: [{
+      type: 'radar',
+      data: [
+        {
+          name: '看多论据强度',
+          value: [9, 6, 8, 7, 5],
+          itemStyle: { color: '#2d6a4f' },
+          areaStyle: { color: 'rgba(45,106,79,0.18)' },
+          lineStyle: { width: 2 }
+        },
+        {
+          name: '看空论据强度',
+          value: [4, 8, 5, 6, 8],
+          itemStyle: { color: '#b8860b' },
+          areaStyle: { color: 'rgba(184,134,11,0.15)' },
+          lineStyle: { width: 2 }
+        }
+      ]
+    }]
+  };
+}
+
+const charts = [];
+function init(id, factory) {
+  const inst = echarts.init(document.getElementById(id));
+  inst.setOption(factory(), true);
+  charts.push({ inst, factory });
+}
+init('chart-pyramid', makePyramid);
+init('chart-radar', makeRadar);
+
+let lastMobile = isMobile();
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    const nowMobile = isMobile();
+    if (nowMobile !== lastMobile) {
+      lastMobile = nowMobile;
+      charts.forEach(({ inst, factory }) => inst.setOption(factory(), true));
+    } else {
+      charts.forEach(({ inst }) => inst.resize());
+    }
+  }, 150);
+});
+</script>
+</body>
+</html>

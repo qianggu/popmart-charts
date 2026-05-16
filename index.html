@@ -143,6 +143,27 @@
     <div class="legend-note">Q1 2026 数据来源：2026-05-12 自愿性公告，未经审核，仅区间披露。</div>
   </div>
 
+  <div class="card grid-full">
+    <h2>⑧ 股价 & PE-TTM 关键时点（2020-12 IPO → 2026-04）</h2>
+    <div class="desc">两次完整估值崩塌：2021 (150x→15x) + 2025-08~2026-04 (82x→14x)。当前 PE 处于上市以来 15-25 分位。</div>
+    <div id="chart-price-pe" class="chart chart-tall"></div>
+    <div class="legend-note">股价单位 HK$；PE 取区间中位（2022-10 用 17.5x、2024-2025 H1 用 42.5x、2025-08 峰值用 82.5x）。来源：valuation-history.md。</div>
+  </div>
+
+  <div class="card">
+    <h2>⑨ 卖方目标价分歧（2026 年报后）</h2>
+    <div class="desc">24 家中位 HK$253.68（+65%）；跨度 2.5x — 极度分歧本身是信号。</div>
+    <div id="chart-targets" class="chart"></div>
+    <div class="legend-note">Bernstein / Deutsche Bank 评 Sell（未给目标价）。当前股价 HK$153.20。</div>
+  </div>
+
+  <div class="card">
+    <h2>⑩ 2024-01 同业 PE 对比</h2>
+    <div class="desc">"S 曲线起跳前夜" Pop Mart 17.5x（2024E），低于行业 24.1x — 后续被实际打穿 2.6 倍。</div>
+    <div id="chart-peer-pe" class="chart"></div>
+    <div class="legend-note">数据时点 2024-01-10；来源：开源证券行业报告。</div>
+  </div>
+
 </div>
 
 <footer>
@@ -150,7 +171,8 @@
   <code>wiki/financials/2017-2019-pre-ipo.md</code> ·
   <code>wiki/financials/2025-annual.md</code> ·
   <code>wiki/financials/revenue-by-ip.md</code> ·
-  <code>wiki/financials/revenue-by-region.md</code><br>
+  <code>wiki/financials/revenue-by-region.md</code> ·
+  <code>wiki/financials/valuation-history.md</code><br>
   渲染：ECharts 5.5（CDN）。
 </footer>
 
@@ -326,6 +348,121 @@ function makeQ12026() {
   };
 }
 
+function makePricePE() {
+  const m = isMobile();
+  // 7 个关键时点（来源 valuation-history.md）
+  const points = ['2020-12 IPO 招股', '2020-12 首日开盘', '2021 初峰值', '2022-10 低点', '2024-01-10', '2025-08 峰值', '2026-04-28'];
+  const price = [38.50, 77.10, 107.60, 9.54, 19.00, 339.80, 153.20];
+  const pe = [null, 156, 150, 17.5, 23, 82.5, 14.6];
+  const notes = ['区间高端定价', '首日 +100%', '第一波泡沫', '从峰值 -91%', '"被低估的成长股"', '第二波泡沫', '从峰值 -55%'];
+  return {
+    tooltip: {
+      trigger: 'axis', confine: true,
+      formatter: (params) => {
+        const i = params[0].dataIndex;
+        const lines = [`<b>${points[i]}</b>`];
+        params.forEach(p => {
+          if (p.value != null) lines.push(`${p.marker}${p.seriesName}：${p.value}${p.seriesName === '股价' ? ' HK$' : 'x'}`);
+        });
+        if (notes[i]) lines.push(`<span style="color:#888">${notes[i]}</span>`);
+        return lines.join('<br>');
+      }
+    },
+    legend: { top: 0, data: ['股价', 'PE-TTM'], textStyle: { fontSize: m ? 11 : 12 } },
+    grid: { left: m ? 40 : 60, right: m ? 40 : 70, top: m ? 36 : 40, bottom: m ? 64 : 50 },
+    xAxis: {
+      type: 'category', data: points,
+      axisLabel: { fontSize: m ? 9 : 11, rotate: m ? 35 : 18, interval: 0 }
+    },
+    yAxis: [
+      { type: 'value', name: m ? '' : '股价 HK$', position: 'left', axisLabel: { fontSize: m ? 10 : 12 } },
+      { type: 'value', name: m ? '' : 'PE-TTM', position: 'right', axisLabel: { formatter: '{value}x', fontSize: m ? 10 : 12 } }
+    ],
+    series: [
+      { name: '股价', type: 'line', yAxisIndex: 0, smooth: false,
+        data: price, itemStyle: { color: '#c8332e' }, lineStyle: { width: 2.5 },
+        symbolSize: m ? 7 : 9,
+        label: m ? { show: false } : { show: true, position: 'top', formatter: '{c}', fontSize: 10 } },
+      { name: 'PE-TTM', type: 'line', yAxisIndex: 1, smooth: false,
+        data: pe, itemStyle: { color: '#1d4e89' }, lineStyle: { width: 2, type: 'dashed' },
+        symbolSize: m ? 6 : 8, connectNulls: true,
+        label: m ? { show: false } : { show: true, position: 'bottom', formatter: '{c}x', fontSize: 10 } }
+    ]
+  };
+}
+
+function makeTargets() {
+  const m = isMobile();
+  const data = [
+    { name: '招商证券（香港）', value: 130 },
+    { name: '海通国际', value: 158.76 },
+    { name: '交银国际', value: 232.80 },
+    { name: '中金', value: 248 },
+    { name: '中位数（24家）', value: 253.68, highlight: true },
+    { name: '大摩', value: 278 },
+    { name: '浦银国际', value: 284.50 },
+    { name: 'JPM', value: 300 },
+    { name: '汇丰', value: 329.5 }
+  ];
+  return {
+    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, confine: true, valueFormatter: v => 'HK$' + v },
+    grid: { left: m ? 92 : 110, right: m ? 30 : 40, top: 20, bottom: 50 },
+    xAxis: {
+      type: 'value', axisLabel: { fontSize: m ? 10 : 12 },
+      axisLine: { show: true }
+    },
+    yAxis: {
+      type: 'category', data: data.map(d => d.name),
+      axisLabel: { fontSize: m ? 10 : 12 }
+    },
+    series: [{
+      type: 'bar',
+      data: data.map(d => ({
+        value: d.value,
+        itemStyle: { color: d.highlight ? '#b8860b' : '#c8332e' }
+      })),
+      label: { show: true, position: 'right', formatter: '{c}', fontSize: m ? 10 : 11 },
+      markLine: {
+        symbol: 'none',
+        data: [{ xAxis: 153.20, name: '当前 153.20' }],
+        lineStyle: { color: '#2d6a4f', type: 'solid', width: 2 },
+        label: { formatter: '当前 153.20', position: 'end', fontSize: m ? 10 : 11, color: '#2d6a4f' }
+      }
+    }]
+  };
+}
+
+function makePeerPE() {
+  const m = isMobile();
+  const peers = [
+    { name: 'Funko', value: -8.1 },
+    { name: 'Pop Mart', value: 17.5, highlight: true },
+    { name: '万代南梦宫', value: 19.9 },
+    { name: '迪士尼', value: 20.4 },
+    { name: '名创优品', value: 21.1 },
+    { name: '行业平均', value: 24.1, dashed: true },
+    { name: '三丽鸥', value: 28.8 },
+    { name: '奥飞娱乐', value: 36.8 }
+  ];
+  return {
+    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, confine: true, valueFormatter: v => v + 'x' },
+    grid: { left: m ? 38 : 50, right: m ? 24 : 30, top: 20, bottom: m ? 52 : 40 },
+    xAxis: {
+      type: 'category', data: peers.map(p => p.name),
+      axisLabel: { fontSize: m ? 10 : 11, rotate: m ? 35 : 20, interval: 0 }
+    },
+    yAxis: { type: 'value', axisLabel: { formatter: '{value}x', fontSize: m ? 10 : 12 } },
+    series: [{
+      type: 'bar',
+      data: peers.map(p => ({
+        value: p.value,
+        itemStyle: { color: p.highlight ? '#c8332e' : (p.dashed ? '#999' : '#1d4e89') }
+      })),
+      label: { show: true, position: 'top', formatter: '{c}x', fontSize: m ? 10 : 11 }
+    }]
+  };
+}
+
 const chartDefs = [
   ['chart-revenue', makeRevenue],
   ['chart-margin', makeMargin],
@@ -333,7 +470,10 @@ const chartDefs = [
   ['chart-ip', makeIP],
   ['chart-region-pie', makeRegionPie],
   ['chart-ip-pie', makeIPPie],
-  ['chart-q1-2026', makeQ12026]
+  ['chart-q1-2026', makeQ12026],
+  ['chart-price-pe', makePricePE],
+  ['chart-targets', makeTargets],
+  ['chart-peer-pe', makePeerPE]
 ];
 
 function renderAll() {

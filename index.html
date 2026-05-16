@@ -63,6 +63,18 @@
     word-break: break-all;
   }
   .legend-note { font-size: 11px; color: var(--muted); margin-top: 6px; font-style: italic; }
+  .insight {
+    margin-top: 12px;
+    padding: 10px 12px 8px;
+    background: #fdf8f6;
+    border-left: 3px solid var(--accent);
+    font-size: 12.5px;
+    line-height: 1.7;
+    color: #2a2a2a;
+    border-radius: 0 4px 4px 0;
+  }
+  .insight strong { color: var(--accent); font-weight: 600; }
+  .insight em { color: #888; font-style: normal; font-size: 11px; }
 
   @media (max-width: 900px) {
     .grid { grid-template-columns: 1fr; gap: 14px; }
@@ -80,6 +92,8 @@
     .chart { height: 280px; }
     .chart-tall { height: 340px; }
     .legend-note { font-size: 10px; }
+    .insight { font-size: 11.5px; padding: 8px 10px 6px; margin-top: 10px; line-height: 1.65; }
+    .insight em { font-size: 10px; }
     footer { font-size: 11px; }
   }
 </style>
@@ -102,6 +116,10 @@
     <h2>① 营收 vs 利润（柱）+ YoY 增速（线）</h2>
     <div class="desc">营收 2017→2025 共 235x；2022 利润断崖（调整后净利 -42.7%）+ 2024 利润同步起跳。</div>
     <div id="chart-revenue" class="chart chart-tall"></div>
+    <div class="insight">
+      <strong>怎么读：</strong>营收 9 年涨 <strong>235x</strong> 看起来一路向上，但金色利润线 2022 突然下挫——营收 +2.8% 时调整后净利却 <strong>-42.7%</strong>，海外铺货 + 工艺升级一次性吞噬了毛利。2024-2025 起利润涨幅（+204% / +284%）反超营收（+107% / +185%），是规模效应突破临界点后<strong>经营杠杆放大</strong>的结果：成本端固定，收入端非线性上跳。
+      <em>关键年：2022 利润断崖 / 2024 起利润反弹斜率陡于营收。</em>
+    </div>
     <div class="legend-note">2022 调整后净利 5.74 亿（净利率 12.4%）= 上市后 8 年最低；2023 起利润率回升至 2025 = 35.2%。</div>
   </div>
 
@@ -109,18 +127,28 @@
     <h2>② 利润率三条线</h2>
     <div class="desc">毛利率 / 经营利润率 / 调整后净利率 — U 型曲线（2022 谷底）。</div>
     <div id="chart-margin" class="chart"></div>
+    <div class="insight">
+      <strong>怎么读：</strong>三条线同步深 U，2022 是<strong>结构性谷底</strong>而非单一原因——毛利率 57.5% 回到 2018 水平、净利率 12.4% 上市后最低。2025 毛利率 <strong>72.1%</strong> 创历史新高，驱动力是海外占比上升（拉高均毛利）+ 自有 IP 替代外采。但 35% 净利率已接近 LVMH 区间，进一步上行空间有限。
+    </div>
   </div>
 
   <div class="card">
     <h2>③ 海外营收占比</h2>
     <div class="desc">从 2017 的 0.4% 到 2025 的 43.8%，9 年提升约 110 倍。</div>
     <div id="chart-overseas" class="chart"></div>
+    <div class="insight">
+      <strong>怎么读：</strong>S 曲线右半段。前 4 年（2017-2020）海外几乎为零（&lt;3%），<strong>2022 才真正起飞</strong>（首次进入英美澳新），2024 单年提速 +22pp。从"中国生意"到"全球生意"的拐点真实发生在 2022-2024 这两年——文德一 2018 入职后整整 4 年"埋种期"才看到非线性回报。
+    </div>
   </div>
 
   <div class="card grid-full">
     <h2>④ Top IP 五年营收轨迹（2021–2025）</h2>
     <div class="desc">LABUBU 由 3.04 亿（2021）→ 141.61 亿（2025），单 IP 占比 38.1%；MOLLY 长尾稳定 4x。</div>
     <div id="chart-ip" class="chart chart-tall"></div>
+    <div class="insight">
+      <strong>怎么读：</strong>LABUBU 红色粗线 2023 还和其他 IP 挤在一起（3.68 亿），<strong>2024 斜率突变</strong>（30.4 亿，+727%），2025 直冲 142 亿——单 IP 命运转折的极端样本。同期 SKULLPANDA / MOLLY / DIMOO 都涨但温和，没有"起跳"。灰色虚线 PUCKY 2022 末退出列表，是<strong>"前明星 IP 边缘化"</strong>的另一个极端——同一矩阵里，两种命运并存。
+      <em>核心问题：LABUBU 一旦回吐，谁能接力？</em>
+    </div>
     <div class="legend-note">2024 是 LABUBU "S 曲线"起跳年（+726.6%），不是 2025。SKULLPANDA 2022 曾短暂登顶。</div>
   </div>
 
@@ -128,18 +156,28 @@
     <h2>⑤ 2025 地区营收结构（新口径）</h2>
     <div class="desc">中国大陆 56.2% / 亚太 21.6% / 美洲 18.3% / 欧洲及其他 3.9%。</div>
     <div id="chart-region-pie" class="chart"></div>
+    <div class="insight">
+      <strong>怎么读：</strong>中国仍占大头（56%）但已不是单一市场。最值得关注的是<strong>美洲块（绿色 18.3%）</strong>—— 2024 还只占 6%，单年增加 12pp、营收 +748%。这意味着 Pop Mart 已不依赖东南亚 LABUBU 红利，正在打开北美主流市场——也是 2026 关税风险敞口最大的一块。
+    </div>
   </div>
 
   <div class="card">
     <h2>⑥ 2025 营收按 IP 结构</h2>
     <div class="desc">LABUBU 一家占 38.1%；17 个艺术家 IP 营收破亿，集中度仍极高。</div>
     <div id="chart-ip-pie" class="chart"></div>
+    <div class="insight">
+      <strong>怎么读：</strong>LABUBU 38.1% 已是 2019 年 MOLLY 单极时期（27%）的 1.4 倍——"矩阵化"被一只 IP 反噬。但底下 7 个 IP 都过 10 亿，矩阵厚度仍在；问题是<strong>接力阈值</strong>：SKULLPANDA 35 亿、CRYBABY 29 亿，距离卖方共识的"接班 IP 50 亿"红线仍差 15-20 亿。
+    </div>
   </div>
 
   <div class="card grid-full">
     <h2>⑦ Q1 2026 区域 YoY 减速（vs 2025 全年）</h2>
     <div class="desc">"中国 +100% 仍是最快增速区"颠覆"中国成熟 + 海外接力"叙事；亚太 -128pp 是最大减速。</div>
     <div id="chart-q1-2026" class="chart"></div>
+    <div class="insight">
+      <strong>怎么读：</strong>所有地区都在减速，但<strong>中国 +100% 仍是最快增速区</strong>——颠覆"中国成熟、海外接力"的二元叙事。亚太减速 -128pp 最严重，可能是东南亚 LABUBU 红利期已过。美洲 +57% 同时反驳了 Bloomberg Second Measure "美国 3 月 -45%"的二手数据点，倾向支持"面板偏差"假说。
+      <em>caveat：Q1 是低基数季度，不能简单 ×4 外推全年。</em>
+    </div>
     <div class="legend-note">Q1 2026 数据来源：2026-05-12 自愿性公告，未经审核，仅区间披露。</div>
   </div>
 
@@ -147,6 +185,9 @@
     <h2>⑧ 股价 & PE-TTM 关键时点（2020-12 IPO → 2026-04）</h2>
     <div class="desc">两次完整估值崩塌：2021 (150x→15x) + 2025-08~2026-04 (82x→14x)。当前 PE 处于上市以来 15-25 分位。</div>
     <div id="chart-price-pe" class="chart chart-tall"></div>
+    <div class="insight">
+      <strong>怎么读：</strong>两次完整的"估值崩塌"清晰可见——2021（150x → 17x）和 2025-08（82x → 14x）。当前 PE <strong>14.6x</strong> 已处于上市以来 15-25 分位（接近 2022 年熊市底），但<strong>股价 153 仍是 2022 底（9.54）的 16 倍</strong>——市场承认基本面已抬升，但拒绝继续支付溢价。这是典型的"贵估值修正完毕，但便宜叙事尚未建立"中间态。
+    </div>
     <div class="legend-note">股价单位 HK$；PE 取区间中位（2022-10 用 17.5x、2024-2025 H1 用 42.5x、2025-08 峰值用 82.5x）。来源：valuation-history.md。</div>
   </div>
 
@@ -154,6 +195,9 @@
     <h2>⑨ 卖方目标价分歧（2026 年报后）</h2>
     <div class="desc">24 家中位 HK$253.68（+65%）；跨度 2.5x — 极度分歧本身是信号。</div>
     <div id="chart-targets" class="chart"></div>
+    <div class="insight">
+      <strong>怎么读：</strong>8 家有名机构目标价跨度 <strong>130~330（2.5 倍）</strong>，中位数 253 隐含 +65% 上行——但 Bernstein / Deutsche Bank 评 Sell（46 家覆盖中唯二），招商证券暗示 130 已接近当前价。"目标价跨度 2.5 倍"本身是强分歧信号：LABUBU 是<strong>"S 曲线进入第二阶段平台期"</strong>还是<strong>"已过峰"</strong>，卖方没共识。
+    </div>
     <div class="legend-note">Bernstein / Deutsche Bank 评 Sell（未给目标价）。当前股价 HK$153.20。</div>
   </div>
 
@@ -161,6 +205,10 @@
     <h2>⑩ 2024-01 同业 PE 对比</h2>
     <div class="desc">"S 曲线起跳前夜" Pop Mart 17.5x（2024E），低于行业 24.1x — 后续被实际打穿 2.6 倍。</div>
     <div id="chart-peer-pe" class="chart"></div>
+    <div class="insight">
+      <strong>怎么读：</strong>2024-01 时点 Pop Mart 17.5x 在覆盖组里"被低估"——低于三丽鸥 28.8x、迪士尼 20.4x、行业均值 24.1x。后续 18 个月卖方 EPS 共识被实际打穿 <strong>2.6 倍</strong>（共识 0.99 HK$ vs 实际 2.54 HK$），这种"事前低估"是 2024-2025 估值爆发的市场结构性起点。
+      <em>反向问题：当前 14x 是否会再次被打穿？相同结构、不同基数。</em>
+    </div>
     <div class="legend-note">数据时点 2024-01-10；来源：开源证券行业报告。</div>
   </div>
 
@@ -168,6 +216,9 @@
     <h2>⑪ 月度收盘价 + 估算市值（2020-12 → 2026-05）</h2>
     <div class="desc">67 个月度数据点，覆盖 IPO 至今。首次月度收盘回到 IPO 月（81.90）耗时 47 个月，到 2024-11 才发生。两次完整估值周期可见。</div>
     <div id="chart-monthly" class="chart chart-tall"></div>
+    <div class="insight">
+      <strong>怎么读：</strong>IPO 月收盘 81.90 的水平虚线一目了然——<strong>首次回到 IPO 月份耗时 47 个月</strong>，要等到 2024-11。IPO 当月买入持有的投资者，前 4 年都在水下。两次完整估值周期清晰可辨：<strong>2021-2022 慢周期</strong>（-89% / 20 个月，-4.4%/月）vs <strong>2025-2026 快周期</strong>（-53% / 9 个月，-7.9%/月）——速度 1.8 倍但幅度尚未到第一波底。若延续幅度类比，从 152 仍有 -30~-40% 下行风险，与卖方共识中位线 253 形成两极对照。
+    </div>
     <div class="legend-note">月度收盘价来源 Yahoo Finance；市值 = 收盘 × 已发行股本（2020-2022 用 1,402M / 2023-2024 用 1,378M / 2025 起用 1,341M，与回购节奏对齐）。</div>
   </div>
 

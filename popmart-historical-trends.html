@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>泡泡玛特 9 年关键指标趋势（2017–2025）</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+  :root {
+    --bg: #fafaf7;
+    --ink: #1a1a1a;
+    --muted: #6b6b6b;
+    --line: #e0ddd5;
+    --accent: #c8332e;
+    --paper: #ffffff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+                 "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+    font-size: 14px;
+  }
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 36px 24px 80px; }
+  header {
+    border-bottom: 3px solid var(--accent);
+    padding-bottom: 22px;
+    margin-bottom: 30px;
+  }
+  header .eyebrow {
+    color: var(--accent);
+    font-size: 12px;
+    letter-spacing: 2px;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  header h1 {
+    font-size: 28px;
+    margin: 0 0 8px;
+    letter-spacing: -0.5px;
+  }
+  header .sub { color: var(--muted); font-size: 13px; }
+  header .sub a { color: var(--accent); text-decoration: none; }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .grid-full { grid-column: 1 / -1; }
+  .card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 18px 20px 14px;
+  }
+  .card h2 {
+    font-size: 16px;
+    margin: 0 0 4px;
+    letter-spacing: -0.2px;
+  }
+  .card .desc {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .chart { width: 100%; height: 360px; }
+  .chart-tall { height: 440px; }
+  footer {
+    margin-top: 36px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .legend-note {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 6px;
+    font-style: italic;
+  }
+  @media (max-width: 900px) {
+    .grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">POP MART · 9992.HK · 历史趋势</div>
+  <h1>泡泡玛特 9 年关键指标趋势（2017–2025）</h1>
+  <div class="sub">
+    数据口径：招股书 + 2020/2021/2022/2023/2024/2025 年报，覆盖 2017→2025 全年 9 年完整序列。
+    全部数字单位人民币亿元。生成日 2026-05-16。
+  </div>
+</header>
+
+<div class="grid">
+
+  <div class="card grid-full">
+    <h2>① 营收 vs 利润（柱）+ YoY 增速（线）</h2>
+    <div class="desc">营收 2017→2025 共 235x；2022 利润断崖（调整后净利 -42.7%）+ 2024 利润同步起跳。</div>
+    <div id="chart-revenue" class="chart chart-tall"></div>
+    <div class="legend-note">2022 调整后净利 5.74 亿（净利率 12.4%）= 上市后 8 年最低；2023 起利润率回升至 2025 = 35.2%。</div>
+  </div>
+
+  <div class="card">
+    <h2>② 利润率三条线</h2>
+    <div class="desc">毛利率 / 经营利润率 / 调整后净利率 — U 型曲线（2022 谷底）。</div>
+    <div id="chart-margin" class="chart"></div>
+  </div>
+
+  <div class="card">
+    <h2>③ 海外营收占比</h2>
+    <div class="desc">从 2017 的 0.4% 到 2025 的 43.8%，9 年提升约 110 倍。</div>
+    <div id="chart-overseas" class="chart"></div>
+  </div>
+
+  <div class="card grid-full">
+    <h2>④ Top IP 五年营收轨迹（2021–2025）</h2>
+    <div class="desc">LABUBU 由 3.04 亿（2021）→ 141.61 亿（2025），单 IP 占比 38.1%；MOLLY 长尾稳定 4x。</div>
+    <div id="chart-ip" class="chart chart-tall"></div>
+    <div class="legend-note">2024 是 LABUBU "S 曲线"起跳年（+726.6%），不是 2025。SKULLPANDA 2022 曾短暂登顶。</div>
+  </div>
+
+  <div class="card">
+    <h2>⑤ 2025 地区营收结构（新口径）</h2>
+    <div class="desc">中国大陆 56.2% / 亚太 21.6% / 美洲 18.3% / 欧洲及其他 3.9%。</div>
+    <div id="chart-region-pie" class="chart"></div>
+  </div>
+
+  <div class="card">
+    <h2>⑥ 2025 营收按 IP 结构</h2>
+    <div class="desc">LABUBU 一家占 38.1%；17 个艺术家 IP 营收破亿，集中度仍极高。</div>
+    <div id="chart-ip-pie" class="chart"></div>
+  </div>
+
+  <div class="card grid-full">
+    <h2>⑦ Q1 2026 区域 YoY 减速（vs 2025 全年）</h2>
+    <div class="desc">"中国 +100% 仍是最快增速区"颠覆"中国成熟 + 海外接力"叙事；亚太 -128pp 是最大减速。</div>
+    <div id="chart-q1-2026" class="chart"></div>
+    <div class="legend-note">Q1 2026 数据来源：2026-05-12 自愿性公告，未经审核，仅区间披露。</div>
+  </div>
+
+</div>
+
+<footer>
+  来源（wiki 路径）：
+  <code>wiki/financials/2017-2019-pre-ipo.md</code> ·
+  <code>wiki/financials/2025-annual.md</code> ·
+  <code>wiki/financials/revenue-by-ip.md</code> ·
+  <code>wiki/financials/revenue-by-region.md</code><br>
+  渲染：ECharts 5.5（CDN）。本文件位于 <code>analysis/popmart-historical-trends.html</code>，可直接用浏览器打开。
+</footer>
+
+</div>
+
+<script>
+const years = ['2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024', '2025'];
+
+// ① 营收 vs 调整后净利 + YoY
+echarts.init(document.getElementById('chart-revenue')).setOption({
+  tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
+  legend: { top: 0, data: ['营收', '调整后净利', '营收 YoY'] },
+  grid: { left: 60, right: 70, top: 40, bottom: 40 },
+  xAxis: { type: 'category', data: years },
+  yAxis: [
+    { type: 'value', name: '亿元', position: 'left' },
+    { type: 'value', name: 'YoY %', position: 'right', axisLabel: { formatter: '{value}%' } }
+  ],
+  series: [
+    {
+      name: '营收', type: 'bar', yAxisIndex: 0,
+      data: [1.58, 5.15, 16.83, 25.13, 44.91, 46.17, 63.01, 130.38, 371.20],
+      itemStyle: { color: '#c8332e' },
+      label: { show: true, position: 'top', formatter: '{c}', fontSize: 10 }
+    },
+    {
+      name: '调整后净利', type: 'bar', yAxisIndex: 0,
+      data: [0.017, 1.00, 4.69, 5.91, 10.02, 5.74, 11.91, 34.03, 130.84],
+      itemStyle: { color: '#b8860b' },
+      label: { show: true, position: 'top', formatter: '{c}', fontSize: 10 }
+    },
+    {
+      name: '营收 YoY', type: 'line', yAxisIndex: 1, smooth: true,
+      data: [null, 225.4, 227.2, 49.3, 78.7, 2.8, 36.5, 106.9, 184.7],
+      itemStyle: { color: '#1d4e89' },
+      lineStyle: { width: 2 },
+      label: { show: true, formatter: '{c}%', fontSize: 10 }
+    }
+  ]
+});
+
+// ② 利润率
+echarts.init(document.getElementById('chart-margin')).setOption({
+  tooltip: { trigger: 'axis', valueFormatter: v => v + '%' },
+  legend: { top: 0, data: ['毛利率', '经营利润率', '调整后净利率'] },
+  grid: { left: 50, right: 20, top: 40, bottom: 30 },
+  xAxis: { type: 'category', data: years },
+  yAxis: { type: 'value', axisLabel: { formatter: '{value}%' } },
+  series: [
+    { name: '毛利率', type: 'line', smooth: true, data: [47.6, 57.9, 64.8, 63.4, 61.4, 57.5, 61.3, 66.8, 72.1], itemStyle: { color: '#c8332e' } },
+    { name: '经营利润率', type: 'line', smooth: true, data: [2.8, 26.0, 35.6, 28.6, 25.6, 12.6, 19.5, 31.9, 45.5], itemStyle: { color: '#1d4e89' } },
+    { name: '调整后净利率', type: 'line', smooth: true, data: [1.1, 19.5, 27.9, 23.5, 22.3, 12.4, 18.9, 26.1, 35.2], itemStyle: { color: '#2d6a4f' } }
+  ]
+});
+
+// ③ 海外营收占比
+echarts.init(document.getElementById('chart-overseas')).setOption({
+  tooltip: { trigger: 'axis', valueFormatter: v => v + '%' },
+  grid: { left: 50, right: 20, top: 30, bottom: 30 },
+  xAxis: { type: 'category', data: years },
+  yAxis: { type: 'value', axisLabel: { formatter: '{value}%' }, max: 50 },
+  series: [{
+    type: 'line', smooth: true,
+    data: [0.4, 0.85, 1.6, 3.0, 4.1, 9.8, 16.9, 38.9, 43.8],
+    itemStyle: { color: '#c8332e' },
+    areaStyle: { color: 'rgba(200,51,46,0.15)' },
+    label: { show: true, formatter: '{c}%', fontSize: 10 }
+  }]
+});
+
+// ④ IP 五年轨迹
+echarts.init(document.getElementById('chart-ip')).setOption({
+  tooltip: { trigger: 'axis' },
+  legend: { top: 0, data: ['LABUBU', 'SKULLPANDA', 'MOLLY', 'DIMOO', 'CRYBABY', 'HIRONO', 'PUCKY'] },
+  grid: { left: 60, right: 30, top: 40, bottom: 30 },
+  xAxis: { type: 'category', data: ['2021', '2022', '2023', '2024', '2025'] },
+  yAxis: { type: 'value', name: '亿元' },
+  series: [
+    { name: 'LABUBU', type: 'line', smooth: true, data: [3.04, 2.63, 3.68, 30.41, 141.61], itemStyle: { color: '#c8332e' }, lineStyle: { width: 3 } },
+    { name: 'SKULLPANDA', type: 'line', smooth: true, data: [5.95, 8.52, 10.25, 13.08, 35.40], itemStyle: { color: '#6a4c93' } },
+    { name: 'MOLLY', type: 'line', smooth: true, data: [7.05, 8.02, 10.20, 20.93, 28.97], itemStyle: { color: '#1d4e89' } },
+    { name: 'DIMOO', type: 'line', smooth: true, data: [5.67, 5.78, 7.38, 9.10, 27.77], itemStyle: { color: '#2d6a4f' } },
+    { name: 'CRYBABY', type: 'line', smooth: true, data: [null, null, 0.71, 11.65, 29.29], itemStyle: { color: '#e07a5f' }, connectNulls: true },
+    { name: 'HIRONO', type: 'line', smooth: true, data: [0.52, 1.41, 3.51, 7.27, 17.35], itemStyle: { color: '#b8860b' } },
+    { name: 'PUCKY', type: 'line', smooth: true, data: [1.82, 1.19, null, null, null], itemStyle: { color: '#999' }, lineStyle: { type: 'dashed' } }
+  ]
+});
+
+// ⑤ 2025 地区饼图
+echarts.init(document.getElementById('chart-region-pie')).setOption({
+  tooltip: { trigger: 'item', formatter: '{b}: {c} 亿（{d}%）' },
+  legend: { bottom: 0 },
+  series: [{
+    type: 'pie', radius: ['40%', '70%'],
+    data: [
+      { value: 208.52, name: '中国大陆', itemStyle: { color: '#c8332e' } },
+      { value: 80.11, name: '亚太（含港澳台）', itemStyle: { color: '#1d4e89' } },
+      { value: 68.06, name: '美洲', itemStyle: { color: '#2d6a4f' } },
+      { value: 14.51, name: '欧洲及其他', itemStyle: { color: '#b8860b' } }
+    ],
+    label: { formatter: '{b}\n{d}%' }
+  }]
+});
+
+// ⑥ 2025 IP 饼图
+echarts.init(document.getElementById('chart-ip-pie')).setOption({
+  tooltip: { trigger: 'item', formatter: '{b}: {c} 亿（{d}%）' },
+  legend: { bottom: 0, type: 'scroll' },
+  series: [{
+    type: 'pie', radius: ['40%', '70%'],
+    data: [
+      { value: 141.61, name: 'LABUBU', itemStyle: { color: '#c8332e' } },
+      { value: 35.40, name: 'SKULLPANDA', itemStyle: { color: '#6a4c93' } },
+      { value: 29.29, name: 'CRYBABY', itemStyle: { color: '#e07a5f' } },
+      { value: 28.97, name: 'MOLLY', itemStyle: { color: '#1d4e89' } },
+      { value: 27.77, name: 'DIMOO', itemStyle: { color: '#2d6a4f' } },
+      { value: 20.56, name: 'Twinkle Twinkle', itemStyle: { color: '#f4a261' } },
+      { value: 17.35, name: 'HIRONO', itemStyle: { color: '#b8860b' } },
+      { value: 8.48, name: 'HACIPUPU', itemStyle: { color: '#8d99ae' } },
+      { value: 24.64, name: '其他艺术家 IP', itemStyle: { color: '#bbb' } },
+      { value: 33.82, name: '授权 IP', itemStyle: { color: '#cdb4db' } },
+      { value: 3.32, name: '外采及其他', itemStyle: { color: '#e9ecef' } }
+    ],
+    label: { formatter: '{b}\n{d}%', fontSize: 11 }
+  }]
+});
+
+// ⑦ Q1 2026 vs 2025 全年
+echarts.init(document.getElementById('chart-q1-2026')).setOption({
+  tooltip: { trigger: 'axis', valueFormatter: v => v + '%' },
+  legend: { top: 0, data: ['Q1 2026 YoY', '2025 全年 YoY'] },
+  grid: { left: 60, right: 30, top: 40, bottom: 40 },
+  xAxis: { type: 'category', data: ['整体', '中国大陆', '亚太', '美洲', '欧洲及其他'] },
+  yAxis: { type: 'value', axisLabel: { formatter: '{value}%' } },
+  series: [
+    {
+      name: 'Q1 2026 YoY', type: 'bar',
+      data: [77.5, 102.5, 27.5, 57.5, 62.5],
+      itemStyle: { color: '#c8332e' },
+      label: { show: true, position: 'top', formatter: '{c}%', fontSize: 11 }
+    },
+    {
+      name: '2025 全年 YoY', type: 'bar',
+      data: [184.7, 134.6, 157.6, 748.4, 506.3],
+      itemStyle: { color: '#1d4e89' },
+      label: { show: true, position: 'top', formatter: '{c}%', fontSize: 11 }
+    }
+  ]
+});
+
+// 响应式
+window.addEventListener('resize', () => {
+  document.querySelectorAll('.chart, .chart-tall').forEach(el => {
+    const inst = echarts.getInstanceByDom(el);
+    if (inst) inst.resize();
+  });
+});
+</script>
+</body>
+</html>
